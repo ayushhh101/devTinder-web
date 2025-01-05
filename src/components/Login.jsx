@@ -24,7 +24,6 @@ const Login = () => {
       navigate('/feed')
     } catch (error) {
       seterror(error?.response?.data?.message || 'Something went wrong')
-      console.log(error)
     }
   }
 
