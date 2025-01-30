@@ -5,7 +5,5 @@ import App from './App.jsx'
 
 //Main entry point of application
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+    <App />,
 )
