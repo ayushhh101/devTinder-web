@@ -44,28 +44,33 @@ const Requests = () => {
   }
 
   return (
-    <div className='flex flex-col justify-center'>
-      <h1 className='flex justify-center text-bold text-5xl my-4'>Requests</h1>
+    <div className='flex flex-col items-center bg-white min-h-screen py-10'>
+      <h1 className='text-[#FF0099] text-5xl font-extrabold mb-6'>Connection Requests</h1>
 
-      {requests.map((requests) => {
-        const { _id, firstName, lastName, photoUrl, age, gender, about } = requests.fromUserId
+      {requests.map((request) => {
+        const { _id, firstName, lastName, photoUrl, age, gender, about } = request.fromUserId
         return (
-          <div key={_id}>
-            <div className='flex justify-between items-center m-4 p-4 rounded-lg bg-base-300 w-2/3 mx-auto my-2'>
-              <div>
-                <img src={photoUrl} className='w-20 h-20 rounded-full' alt="photo" />
+          <div key={_id} className='flex items-center justify-between p-6 w-[65%] bg-white border-2 border-[#FF0099] rounded-lg shadow-lg mb-4'>
+            <div className='flex items-center gap-6'>
+              <img src={photoUrl} className='w-20 h-20 rounded-full border-4 border-[#FF0099] shadow-md' alt="User" />
+              <div className='text-left text-gray-800'>
+                <h2 className='text-2xl font-bold'>{firstName + " " + lastName}</h2>
+                <p className='text-lg'>{age}, {gender}</p>
+                <p className='italic text-gray-600'>{about}</p>
               </div>
-              <div className='text-left mx-4'>
-                <h2 className='font-bold'>
-                  {firstName + " " + lastName}
-                </h2>
-                <p>{age + "," + gender}</p>
-                <p>{about}</p>
-              </div>
-              <div>
-                <button className="btn btn-primary mx-2" onClick={() => reviewRequest("rejected", requests._id)}>Reject</button>
-                <button className="btn btn-secondary" onClick={() => reviewRequest("accepted", requests._id)}>Accept</button>
-              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button 
+                className="px-5 py-2 bg-gray-300 text-gray-800 rounded-lg shadow-md hover:bg-gray-400 transition"
+                onClick={() => reviewRequest("rejected", request._id)}>
+                ❌ Reject
+              </button>
+              <button 
+                className="px-5 py-2 bg-[#FF0099] text-white rounded-lg shadow-lg hover:bg-[#FF3A3A] transition transform hover:scale-105"
+                onClick={() => reviewRequest("accepted", request._id)}>
+                ✅ Accept
+              </button>
             </div>
           </div>
         )

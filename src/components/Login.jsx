@@ -48,69 +48,71 @@ const Login = () => {
   }
 
   return (
-    <div className='flex items-center justify-center'>
-      <div className="card bg-base-100 w-96 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title justify-center">{isLoginForm ? "Login" : "SignUp"}</h2>
-          <div>
-            {!isLoginForm ?
-              <>
-                <label className="form-control w-full max-w-xs my-3">
-                  <div className="label">
-                    <span className="label-text">First Name</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={firstName}
-                    className="input input-bordered w-full max-w-xs"
-                    onChange={(e) => setfirstName(e.target.value)}
-                  />
-                </label>
-                <label className="form-control w-full max-w-xs my-3">
-                  <div className="label">
-                    <span className="label-text">Last Name</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={lastName}
-                    className="input input-bordered w-full max-w-xs"
-                    onChange={(e) => setlastName(e.target.value)}
-                  />
-                </label>
-              </> : null}
-            <label className="form-control w-full max-w-xs my-3">
-              <div className="label">
-                <span className="label-text">Email ID</span>
-              </div>
-              <input
-                type="text"
-                value={emailId}
-                className="input input-bordered w-full max-w-xs"
-                onChange={(e) => setemailId(e.target.value)}
+    <div className='flex justify-center items-center min-h-screen bg-white'>
+      <div className="w-[400px] p-6 bg-white border-2 border-[#FF0099] shadow-xl rounded-lg">
+        <h2 className="text-center text-3xl font-bold text-[#FF0099] mb-6 ">
+          {isLoginForm ? "Welcome Back!" : "Create an Account"}
+        </h2>
+
+        {!isLoginForm && (
+          <>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-semibold">First Name</label>
+              <input 
+                type="text" 
+                value={firstName} 
+                className="w-full p-2 mt-1 border-2 border-gray-300 rounded-lg focus:border-[#FF0099] focus:ring-[#FF0099] focus:ring-1"
+                onChange={(e) => setfirstName(e.target.value)} 
               />
-            </label>
-            <label className="form-control w-full max-w-xs my-3">
-              <div className="label">
-                <span className="label-text">Password</span>
-              </div>
-              <input
-                type="text"
-                value={password}
-                className="input input-bordered w-full max-w-xs"
-                onChange={(e) => setpassword(e.target.value)}
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 font-semibold">Last Name</label>
+              <input 
+                type="text" 
+                value={lastName} 
+                className="w-full p-2 mt-1 border-2 border-gray-300 rounded-lg focus:border-[#FF0099] focus:ring-[#FF0099] focus:ring-1"
+                onChange={(e) => setlastName(e.target.value)} 
               />
-            </label>
-          </div>
-          <p className='text-center text-red-500'>{error}</p>
-          <div className="card-actions justify-center">
-            <button className="btn btn-primary" onClick={isLoginForm? handleLogin : handleSignUp}>
-              {isLoginForm ? "Login" : "SignUp"}
-            </button>
-          </div>
-          <p className='text-center cursor-pointer' onClick={() => setisLoginForm(!isLoginForm)}>
-            {isLoginForm ? "Don't have an account?" : "Already have an account?"}
-          </p>
+            </div>
+          </>
+        )}
+
+        <div className="mb-4">
+          <label className="block text-gray-700 font-semibold">Email ID</label>
+          <input 
+            type="text" 
+            value={emailId} 
+            className="w-full p-2 mt-1 border-2 border-gray-300 rounded-lg focus:border-[#FF0099] focus:ring-[#FF0099] focus:ring-1"
+            onChange={(e) => setemailId(e.target.value)} 
+          />
         </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-700 font-semibold">Password</label>
+          <input 
+            type="password" 
+            value={password} 
+            className="w-full p-2 mt-1 border-2 border-gray-300 rounded-lg focus:border-[#FF0099] focus:ring-[#FF0099] focus:ring-1"
+            onChange={(e) => setpassword(e.target.value)} 
+          />
+        </div>
+
+        <p className='text-center text-red-500 font-semibold'>{error}</p>
+
+        <div className="flex justify-center mt-4">
+          <button 
+            className="w-full py-2 bg-[#FF0099] text-white font-semibold rounded-lg shadow-md hover:bg-[#FF3A3A] transition transform hover:scale-105"
+            onClick={isLoginForm ? handleLogin : handleSignUp}>
+            {isLoginForm ? "Login" : "Sign Up"}
+          </button>
+        </div>
+
+        <p 
+          className='text-center text-gray-700 mt-4 cursor-pointer hover:underline'
+          onClick={() => setisLoginForm(!isLoginForm)}>
+          {isLoginForm ? "Don't have an account? Sign Up" : "Already have an account? Login"}
+        </p>
       </div>
     </div>
   )
