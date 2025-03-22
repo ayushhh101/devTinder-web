@@ -4,6 +4,7 @@
 DevTinder is a platform designed to connect developers based on their skills, interests, and projects. It provides a swipe-based interface to match developers with potential collaborators, mentors, or job opportunities.
 
 This repository contains the **frontend** of DevTinder, built using modern web technologies, and connects to the backend hosted at [DevTinder-BE](https://github.com/ayushhh101/DevTinder-BE).
+
 ⚠️ **Important:** The frontend relies on the backend services to function correctly. **You must run the backend server** for the frontend to work properly.
 
 ## 🛠 Tech Stack
