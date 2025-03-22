@@ -61,9 +61,6 @@ The optimized production build will be available in the `build/` directory. You 
 ## 🤝 Contributing
 We welcome contributions! Feel free to **fork** the repository, create a branch, and submit a pull request.
 
-## 📜 License
-This project is licensed under the **MIT License**.
-
 ## 📩 Contact
 For queries or collaborations, reach out to **Ayushhh101** via GitHub or email.
 
