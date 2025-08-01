@@ -9,6 +9,7 @@ import Connections from "./components/Connections"
 import Requests from "./components/Requests"
 import Chat from "./components/Chat"
 import './App.css'
+import ProfileSearch from "./components/ProfileSearch"
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
               <Route path="/connections" element={<Connections />} />
               <Route path="/requests" element={<Requests />} />
               <Route path="/chat/:targetUserId" element={<Chat />} />
+              <Route path="/search" element={<ProfileSearch />} />
             </Route>
           </Routes>
         </BrowserRouter>

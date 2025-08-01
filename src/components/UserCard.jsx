@@ -37,26 +37,23 @@ const UserCard = ({ user }) => {
 
   return (
     <div
-      className="w-full h-screen flex justify-center items-center bg-gradient-to-br from-indigo-500 via-purple-500 to-sky-400 mt-2"
+      className="w-full h-screen flex justify-center items-center bg-gradient-to-br from-indigo-500 via-purple-500 to-sky-400 mt-2 rounded-3xl"
       style={{ fontFamily: 'Inter, Helvetica, Arial, sans-serif' }}
     >
-      <div className="relative min-h-full w-full max-w-md bg-white/10 rounded-3xl shadow-2xl ring-2 ring-indigo-200/20 overflow-hidden backdrop-blur-[4px] border border-indigo-100/10">
+      <div className="relative min-h-full w-full max-w-md rounded-3xl shadow-2xl  ring-indigo-200/20 overflow-hidden border  border-indigo-100/10">
         {/* Image Section */}
         <div className="relative h-full w-full overflow-hidden z-10">
           <img
             src={photoUrl}
             alt={displayName}
             className="w-full h-full object-cover"
-            loading="lazy"
           />
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/80 to-transparent z-20" />
         </div>
         {/* DETAILS */}
-        <div className="flex flex-col gap-4 p-7 bg-gradient-to-tr from-[#17163a]/80 to-[#192146]/70 backdrop-blur-[2px]">
+        <div className="flex flex-col gap-4 p-7 bg-gradient-to-tr from-[#17163a]/10 to-[#192146]/50">
           {/* Name and age */}
           <div className="flex items-end gap-3">
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#fb923c] drop-shadow">{displayName}</h1>
+            <h1 className="text-3xl font-extrabold text-[#fb923c]">{displayName}</h1>
             <span className="text-2xl text-slate-200 font-light">{age || '18'}</span>
           </div>
           {/* Headline & Position */}
