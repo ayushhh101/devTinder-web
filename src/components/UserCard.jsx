@@ -10,15 +10,15 @@ const UserCard = ({ user }) => {
   const { _id, firstName, photoUrl, age, about } = user;
   const dispatch = useDispatch();
 
-  const handleSendRequest = async (status, userId) => {
-    try {
-      const res = await axios.post(`${BASE_URL}/request/send/${status}/${userId}`, {}, { withCredentials: true });
-      dispatch(removeUserFromFeed(userId));
-      console.log(res);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const handleSendRequest = async (status, userId) => {
+  //   try {
+  //     const res = await axios.post(`${BASE_URL}/request/send/${status}/${userId}`, {}, { withCredentials: true });
+  //     dispatch(removeUserFromFeed(userId));
+  //     console.log(res);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   return (
     <div
@@ -60,7 +60,7 @@ const UserCard = ({ user }) => {
               </div>
 
               {/* Buttons with Modern Styling */}
-              <div className="flex items-start gap-4 mt-6">
+              {/* <div className="flex items-start gap-4 mt-6">
                 <button
                   className="w-1/2 px-3 py-2 rounded-full bg-[#1e293b] text-white text-3xl flex justify-center items-center shadow-lg hover:bg-[#334155] transition-all border border-gray-600 hover:border-gray-500"
                   onClick={() => handleSendRequest("ignored", _id)}
@@ -73,7 +73,7 @@ const UserCard = ({ user }) => {
                 >
                   <i className="ri-heart-2-fill"></i>
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
