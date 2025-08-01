@@ -43,76 +43,121 @@ const Login = () => {
       dispatch(addUser(res.data.data))
       navigate('/profile')
     } catch (error) {
-      seterror(error?.response?.data?.message || 'Something went wrong')
+      seterror(error?.response?.data?.message || 'Something went wrong'+ error)
     }
   }
 
   return (
-    <div className='flex justify-center items-center min-h-screen bg-white'>
-      <div className="w-[400px] p-6 bg-white border-2 border-[#FF0099] shadow-xl rounded-lg">
-        <h2 className="text-center text-3xl font-bold text-[#FF0099] mb-6 ">
-          {isLoginForm ? "Welcome Back!" : "Create an Account"}
-        </h2>
+    <div 
+      className='flex justify-center items-center min-h-screen p-4'
+      style={{
+        background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
+      }}
+    >
+      <div className="w-full max-w-md p-8 bg-[#0f172a] bg-opacity-90 backdrop-blur-sm border-2 border-[#8b5cf6] shadow-2xl rounded-2xl hover:shadow-[0_0_40px_rgba(139,92,246,0.3)] transition-all duration-300">
+        
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h2 className="text-4xl font-bold text-[#f97316] mb-2 drop-shadow-lg">
+            {isLoginForm ? "Welcome Back!" : "Join DevTinder"}
+          </h2>
+          <p className="text-gray-300 text-sm">
+            {isLoginForm ? "Sign in to continue your journey" : "Create your account to get started"}
+          </p>
+        </div>
 
-        {!isLoginForm && (
-          <>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-semibold">First Name</label>
-              <input 
-                type="text" 
-                value={firstName} 
-                className="w-full p-2 mt-1 border-2 border-gray-300 rounded-lg focus:border-[#FF0099] focus:ring-[#FF0099] focus:ring-1"
-                onChange={(e) => setfirstName(e.target.value)} 
-              />
-            </div>
+        {/* Form Fields */}
+        <div className="space-y-6">
+          {!isLoginForm && (
+            <>
+              <div>
+                <label className="block text-[#f97316] font-semibold mb-2 text-sm">
+                  First Name
+                </label>
+                <input 
+                  type="text" 
+                  value={firstName} 
+                  className="w-full p-3 bg-[#1e293b] border-2 border-gray-600 text-white rounded-lg focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6] focus:ring-opacity-50 focus:outline-none transition-all duration-300 placeholder-gray-400"
+                  placeholder="Enter your first name"
+                  onChange={(e) => setfirstName(e.target.value)} 
+                />
+              </div>
 
-            <div className="mb-4">
-              <label className="block text-gray-700 font-semibold">Last Name</label>
-              <input 
-                type="text" 
-                value={lastName} 
-                className="w-full p-2 mt-1 border-2 border-gray-300 rounded-lg focus:border-[#FF0099] focus:ring-[#FF0099] focus:ring-1"
-                onChange={(e) => setlastName(e.target.value)} 
-              />
-            </div>
-          </>
+              <div>
+                <label className="block text-[#f97316] font-semibold mb-2 text-sm">
+                  Last Name
+                </label>
+                <input 
+                  type="text" 
+                  value={lastName} 
+                  className="w-full p-3 bg-[#1e293b] border-2 border-gray-600 text-white rounded-lg focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6] focus:ring-opacity-50 focus:outline-none transition-all duration-300 placeholder-gray-400"
+                  placeholder="Enter your last name"
+                  onChange={(e) => setlastName(e.target.value)} 
+                />
+              </div>
+            </>
+          )}
+
+          <div>
+            <label className="block text-[#f97316] font-semibold mb-2 text-sm">
+              Email Address
+            </label>
+            <input 
+              type="email" 
+              value={emailId} 
+              className="w-full p-3 bg-[#1e293b] border-2 border-gray-600 text-white rounded-lg focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6] focus:ring-opacity-50 focus:outline-none transition-all duration-300 placeholder-gray-400"
+              placeholder="Enter your email"
+              onChange={(e) => setemailId(e.target.value)} 
+            />
+          </div>
+
+          <div>
+            <label className="block text-[#f97316] font-semibold mb-2 text-sm">
+              Password
+            </label>
+            <input 
+              type="password" 
+              value={password} 
+              className="w-full p-3 bg-[#1e293b] border-2 border-gray-600 text-white rounded-lg focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6] focus:ring-opacity-50 focus:outline-none transition-all duration-300 placeholder-gray-400"
+              placeholder="Enter your password"
+              onChange={(e) => setpassword(e.target.value)} 
+            />
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className='mt-4 p-3 bg-red-900 bg-opacity-50 border border-red-500 rounded-lg'>
+            <p className='text-center text-red-300 font-medium text-sm'>{error}</p>
+          </div>
         )}
 
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold">Email ID</label>
-          <input 
-            type="text" 
-            value={emailId} 
-            className="w-full p-2 mt-1 border-2 border-gray-300 rounded-lg focus:border-[#FF0099] focus:ring-[#FF0099] focus:ring-1"
-            onChange={(e) => setemailId(e.target.value)} 
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold">Password</label>
-          <input 
-            type="password" 
-            value={password} 
-            className="w-full p-2 mt-1 border-2 border-gray-300 rounded-lg focus:border-[#FF0099] focus:ring-[#FF0099] focus:ring-1"
-            onChange={(e) => setpassword(e.target.value)} 
-          />
-        </div>
-
-        <p className='text-center text-red-500 font-semibold'>{error}</p>
-
-        <div className="flex justify-center mt-4">
+        {/* Submit Button */}
+        <div className="mt-8">
           <button 
-            className="w-full py-2 bg-[#FF0099] text-white font-semibold rounded-lg shadow-md hover:bg-[#FF3A3A] transition transform hover:scale-105"
-            onClick={isLoginForm ? handleLogin : handleSignUp}>
-            {isLoginForm ? "Login" : "Sign Up"}
+            className="w-full py-3 bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] hover:from-[#5855eb] hover:to-[#7c3aed] text-white font-bold rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6] focus:ring-opacity-50"
+            onClick={isLoginForm ? handleLogin : handleSignUp}
+          >
+            {isLoginForm ? "Sign In" : "Create Account"}
           </button>
         </div>
 
-        <p 
-          className='text-center text-gray-700 mt-4 cursor-pointer hover:underline'
-          onClick={() => setisLoginForm(!isLoginForm)}>
-          {isLoginForm ? "Don't have an account? Sign Up" : "Already have an account? Login"}
-        </p>
+        {/* Toggle Form */}
+        <div className="mt-6 text-center">
+          <p 
+            className='text-gray-300 cursor-pointer hover:text-[#f97316] transition-colors duration-300 font-medium'
+            onClick={() => setisLoginForm(!isLoginForm)}
+          >
+            {isLoginForm ? "Don't have an account? " : "Already have an account? "}
+            <span className="text-[#f97316] hover:text-orange-400 font-semibold">
+              {isLoginForm ? "Sign Up" : "Sign In"}
+            </span>
+          </p>
+        </div>
+
+        {/* Decorative Elements */}
+        <div className="absolute -top-4 -left-4 w-8 h-8 bg-[#8b5cf6] rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-4 -right-4 w-6 h-6 bg-[#f97316] rounded-full opacity-30 animate-pulse" style={{animationDelay: '1s'}}></div>
       </div>
     </div>
   )

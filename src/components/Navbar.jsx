@@ -23,28 +23,31 @@ const Navbar = () => {
       console.log(error)
     }
   }
+  
   return (  
-    <div className="navbar bg-gradient-to-r from-[#FF3A3A] to-[#FF0099] shadow-lg px-6 border-b-4 border-white">
+    <div className="navbar bg-gradient-to-r from-indigo-600 to-purple-600 border-b border-indigo-500/30 shadow-xl px-6 py-4">
       <div className="flex-1">
         <Link
           to="/feed"
-          className="text-3xl font-bold text-white tracking-wide neon-text hover:text-[#FFD700] transition duration-300"
+          className="text-2xl font-bold text-white tracking-tight hover:text-orange-300 transition duration-200"
         >
-          DevTinder 
+          DevTinder
         </Link>
       </div>
 
       {user && (
         <div className="flex-none flex items-center gap-6">
-          <p className="text-lg font-semibold text-white">Welcome, {user.firstName}</p>
+          <p className="text-sm font-medium text-indigo-100">
+            Welcome, <span className="text-white font-semibold">{user.firstName}</span>
+          </p>
 
           <div className="dropdown dropdown-end relative">
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost btn-circle avatar border-2 border-white shadow-lg shadow-[#FF0099] transition duration-300 hover:shadow-[#FFD700]"
+              className="btn btn-ghost btn-circle avatar p-0 hover:bg-white/10 transition duration-200"
             >
-              <div className="w-12 h-12 rounded-full border-2 border-[#FFD700]">
+              <div className="w-10 h-10 rounded-full border-2 border-white/30 hover:border-orange-400 transition duration-200">
                 <img
                   alt="User Avatar"
                   src={user.photoUrl}
@@ -55,27 +58,42 @@ const Navbar = () => {
 
             <ul
               tabIndex={0}
-              className="dropdown-content menu menu-sm bg-[#1B1B1B] text-white border border-[#FF3A3A] shadow-lg shadow-[#FF0099] rounded-lg mt-3 w-52 p-2 z-50 relative"
+              className="dropdown-content menu bg-slate-800 border border-indigo-500/30 rounded-xl shadow-2xl mt-2 w-48 p-2 z-50"
             >
               <li>
-                <Link to="/profile" className="flex justify-between hover:bg-[#FF0099] hover:text-white transition rounded-md px-3 py-2">
-                  Profile <span className="badge bg-[#FFD700] text-black">New</span>
+                <Link 
+                  to="/profile" 
+                  className="flex justify-between items-center hover:bg-indigo-600/20 hover:text-indigo-300 transition duration-200 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300"
+                >
+                  Profile 
+                  <span className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                    New
+                  </span>
                 </Link>
               </li>
               <li>
-                <Link to="/connections" className="hover:bg-[#FF3A3A] hover:text-white transition rounded-md px-3 py-2">
+                <Link 
+                  to="/connections" 
+                  className="hover:bg-purple-600/20 hover:text-purple-300 transition duration-200 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300"
+                >
                   Connections
                 </Link>
               </li>
               <li>
-                <Link to="/requests" className="hover:bg-[#FF3A3A] hover:text-white transition rounded-md px-3 py-2">
+                <Link 
+                  to="/requests" 
+                  className="hover:bg-indigo-600/20 hover:text-indigo-300 transition duration-200 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300"
+                >
                   Requests
                 </Link>
               </li>
               <li>
-                <a onClick={handleLogout} className="hover:bg-[#FF0099] hover:text-white transition rounded-md px-3 py-2">
+                <button 
+                  onClick={handleLogout} 
+                  className="w-full text-left hover:bg-red-500/20 hover:text-red-300 transition duration-200 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300"
+                >
                   Logout
-                </a>
+                </button>
               </li>
             </ul>
           </div>
