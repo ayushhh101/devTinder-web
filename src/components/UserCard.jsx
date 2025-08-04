@@ -61,7 +61,7 @@ const UserCard = ({ user }) => {
             {/* Location */}
             {location && (
               <div className="flex items-center text-[#333333] text-base mt-1 gap-1">
-                <i className="ri-map-pin-2-fill mr-1 text-sky-400"></i> {location}
+                <i className="ri-map-pin-2-fill mr-1 text-[#0099CC]"></i> {location}
               </div>
             )}
           </div>

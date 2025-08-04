@@ -12,8 +12,8 @@ const Requests = () => {
     try {
       const res = await axios.post(`${BASE_URL}/request/review/${status}/${_id}`, {},
         { withCredentials: true })
-        dispatch(removeRequest(_id))
-        
+      dispatch(removeRequest(_id))
+
       console.log(res)
     } catch (error) {
       console.log(error)
@@ -44,58 +44,56 @@ const Requests = () => {
   }
 
   return (
-    <div 
-      className='flex flex-col items-center min-h-screen py-10'
-      style={{
-        background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
-      }}
-    >
-      <h1 className='text-[#f97316] text-5xl font-extrabold mb-8 text-center drop-shadow-lg'>
+    <div className='flex flex-col items-center min-h-screen py-10 bg-white'>
+      <h1 className='text-2xl sm:text-3xl font-extrabold text-[#1e293b] text-center mb-6 w-full max-w-lg'>
         Connection Requests
       </h1>
 
-      <div className='w-full max-w-5xl px-4'>
+      <div className='w-full max-w-5xl '>
         {requests.map((request) => {
-          const { _id, firstName, lastName, photoUrl, age, gender, about } = request.fromUserId
+          const { _id, firstName, lastName, photoUrl, age, gender, headline, about } = request.fromUserId
           return (
-            <div 
-              key={_id} 
-              className='flex items-center justify-between p-6 w-full bg-[#0f172a] bg-opacity-80 backdrop-blur-sm border-2 border-[#8b5cf6] rounded-2xl shadow-2xl mb-6 hover:border-[#f97316] transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)]'
+            <div
+              key={_id}
+              className='bg-white border border-[#e5eaf1] rounded-2xl shadow-sm px-4 py-5 mb-5 flex justify-between items-center'
             >
-              <div className='flex items-center gap-6'>
-                <div className='relative'>
-                  <img 
-                    src={photoUrl} 
-                    className='w-20 h-20 rounded-full border-4 border-[#8b5cf6] shadow-lg object-cover' 
-                    alt="User" 
+              <div className='flex-shrink-0 mr-4 flex flex-row gap-2 items-center'>
+                <div className='w-14 h-14 rounded-full bg-gray-200 overflow-hidden'>
+                  <img
+                    src={photoUrl}
+                    className='object-cover w-full h-full rounded-full'
                   />
-                  <div className='absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full border-2 border-[#0f172a] flex items-center justify-center'>
+                  {/* <div className='absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full border-2 border-[#0f172a] flex items-center justify-center'>
                     <span className='text-white text-xs font-bold'>!</span>
-                  </div>
+                  </div> */}
                 </div>
-                
-                <div className='text-left text-white'>
-                  <h2 className='text-2xl font-bold text-[#f97316] mb-1'>
+
+                <div className='flex-1 mr-2'>
+                  <h2 className='text-lg leading-tight font-bold text-[#0099CC] mb-1'>
                     {firstName + " " + lastName}
                   </h2>
-                  <p className='text-lg text-gray-300 mb-2'>
-                    {age} • {gender}
-                  </p>
-                  <p className='italic text-gray-400 text-sm max-w-md leading-relaxed'>
-                    {about}
-                  </p>
+                  {headline && (
+                    <div className="text-[#313944] font-medium text-[15px] leading-tight mt-0.5 mb-0.5">
+                      {headline}
+                    </div>
+                  )}
+                  {about && (
+                    <div className="text-[#555d67] text-[15px] leading-[1.4]">
+                      {about}
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <button 
-                  className="px-6 py-3 bg-[#1e293b] text-white rounded-full shadow-lg border border-gray-600 hover:bg-[#334155] hover:border-gray-500 transition-all duration-300 transform hover:scale-105 font-semibold"
+                <button
+                  className="px-4 py-2 bg-[#eef2f6] text-[#657084] font-medium rounded-full shadow-none border border-[#e4e7ee] hover:bg-[#e3eaf6] transition text-[15px]"
                   onClick={() => reviewRequest("rejected", request._id)}
                 >
                   ❌ Reject
                 </button>
-                <button 
-                  className="px-6 py-3 bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] hover:from-[#5855eb] hover:to-[#7c3aed] text-white rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] font-semibold border border-[#8b5cf6] hover:border-[#f97316]"
+                <button
+                  className="px-4 py-2 bg-[#ff6767] text-white font-medium rounded-full shadow-none border border-[#faeded] hover:bg-[#fd4e5c] transition text-[15px]"
                   onClick={() => reviewRequest("accepted", request._id)}
                 >
                   ✅ Accept
