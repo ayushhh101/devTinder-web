@@ -37,67 +37,58 @@ const UserCard = ({ user }) => {
   };
 
   return (
-    <div
-      className="w-full h-screen flex justify-center items-center bg-gradient-to-br from-indigo-500 via-purple-500 to-sky-400 mt-2 rounded-3xl"
-      style={{ fontFamily: 'Inter, Helvetica, Arial, sans-serif' }}
-    >
-      <div className="relative min-h-full w-full max-w-md rounded-3xl shadow-2xl  ring-indigo-200/20 overflow-hidden border  border-indigo-100/10">
+    <div className="w-full h-screen flex justify-center items-center mt-2 rounded-2xl shadow-2xl">
+      <div className="relative min-h-full w-full max-w-md rounded-3xl shadow-2xl bg-white ring-indigo-200/20 overflow-hidden border  border-indigo-100/10">
         {/* Image Section */}
-        <div className="relative h-full w-full overflow-hidden z-10">
+        <div className="relative h-full w-full z-10">
           <img
             src={photoUrl}
             alt={displayName}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover shadow-md"
           />
         </div>
         {/* DETAILS */}
-        <div className="flex flex-col gap-4 p-7 bg-gradient-to-tr from-[#17163a]/10 to-[#192146]/50">
+        <div className="flex flex-col gap-4 p-7 w-full">
           {/* Name and age */}
           <div className="flex items-end gap-3">
-            <h1 className="text-3xl font-extrabold text-[#fb923c]">{displayName}</h1>
-            <span className="text-2xl text-slate-200 font-light">{age || '18'}</span>
+            <h1 className="text-2xl font-bold text-[#0099CC]">{displayName}</h1>
+            <span className="text-xl font-normal text-[#333333]">{age || '18'}</span>
           </div>
           {/* Headline & Position */}
-          {headline && <div className="text-[17px] text-indigo-50 leading-tight">{headline}</div>}
-          {currentPosition && <div className="text-indigo-200 text-base">{currentPosition}</div>}
-          {/* Location */}
-          {location && (
-            <div className="flex items-center text-indigo-300 text-[15px] mt-1 gap-1">
-              <i className="ri-map-pin-2-fill mr-1 text-sky-400"></i> {location}
-            </div>
-          )}
+          {headline && <div className="text-lg text-[#333333] leading-tight">{headline}</div>}
+          <div className='flex flex-row justify-between'>
+            {currentPosition && <div className="text-[#333333] text-base">{currentPosition}</div>}
+            {/* Location */}
+            {location && (
+              <div className="flex items-center text-[#333333] text-base mt-1 gap-1">
+                <i className="ri-map-pin-2-fill mr-1 text-sky-400"></i> {location}
+              </div>
+            )}
+          </div>
           {/* Skills */}
           {skills.length > 0 && (
             <div>
-              <div className="font-medium text-xs text-[#fb923c] mb-1">Skills</div>
               <div className="flex flex-wrap gap-2">
                 {skills.slice(0, 6).map((skill, i) => (
-                  <span key={i} className="bg-indigo-600/60 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-sm">
+                  <span key={i} className="bg-[#ecf3f7] uppercase text-[#1790a7] px-5 py-2 rounded-md text-xs font-semibold shadow-sm whitespace-nowrap">
                     {skill}
                   </span>
                 ))}
-                {skills.length > 6 && (
-                  <span className="bg-gray-700/70 text-gray-100 px-3 py-1 rounded-full text-xs shadow">+{skills.length - 6} more</span>
+                {skills.length > 5 && (
+                  <span className="bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs shadow">+{skills.length - 5} more</span>
                 )}
               </div>
             </div>
           )}
-          {/* Bio */}
-          {about && (
-            <div>
-              <div className="font-medium text-xs text-[#fb923c] mb-1">Bio</div>
-              <div className="text-[15px] text-gray-200 leading-snug line-clamp-4">{about}</div>
-            </div>
-          )}
           {/* Social Links */}
-          <div className="flex items-center gap-5 mt-2">
+          <div className="flex items-center gap-4 mt-1">
             {githubUrl && (
               <a
                 href={githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub profile"
-                className="text-white/80 hover:text-[#fb923c] text-2xl transition"
+                className="text-[#374151] hover:text-[#1790a7] text-xl transition"
               >
                 <i className="ri-github-fill"></i>
               </a>
@@ -108,25 +99,25 @@ const UserCard = ({ user }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn profile"
-                className="text-[#0077b5] hover:text-[#fb923c] text-2xl transition"
+                className="text-[#0077b5] hover:text-[#1790a7] text-xl transition"
               >
                 <i className="ri-linkedin-box-fill"></i>
               </a>
             )}
           </div>
-          <Link to={`/profile/${user._id}`} className="text-indigo-600 font-semibold hover:underline">View Full Profile</Link>
+          <Link to={`/profile/${user._id}`} className="text-[#1790a7] font-medium hover:underline text-sm mt-1">View Full Profile</Link>
 
           {/* Buttons */}
-          <div className="flex gap-4 mt-4">
+          <div className="flex justify-center gap-32 mt-4">
             <button
-              className="w-1/2 py-2 rounded-full bg-gradient-to-r from-[#1e293b] to-[#22224a] text-white text-2xl flex justify-center items-center hover:from-slate-600 hover:to-slate-800 hover:scale-[1.07] transition-all shadow-lg border border-gray-600"
+              className="w-16 h-16 rounded-full flex justify-center items-center bg-[#f0f3f7] hover:bg-[#e3eaf6] transition shadow border-2 border-[#e3eaf6] text-2xl"
               onClick={() => handleSendRequest('ignored', _id)}
               aria-label="Ignore user"
             >
               <i className="ri-close-line"></i>
             </button>
             <button
-              className="w-1/2 py-2 rounded-full bg-gradient-to-tr from-rose-500 via-orange-400 to-fuchsia-600 text-white text-2xl flex justify-center items-center font-bold hover:to-violet-500 hover:scale-[1.07] shadow-xl border-none"
+              className="w-16 h-16 rounded-full flex justify-center items-center bg-[#FF6B6B]  text-white text-2xl font-bold shadow-xl hover:scale-105 active:scale-100 transition-transform"
               onClick={() => handleSendRequest('interested', _id)}
               aria-label="Connect with user"
             >

@@ -26,7 +26,7 @@ const Navbar = () => {
   }
   
   return (  
-   <nav className="bg-[#17b3c9] border-b border-[#c8e6ed] shadow-xl">
+   <nav className="bg-[#0099CC] border-b border-[#c8e6ed] shadow-xl">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
         {/* Brand */}
         <Link

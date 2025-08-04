@@ -85,7 +85,7 @@ const EditProfile = ({ user }) => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 py-10">
+      <div className="min-h-screen bg-white">
         <div className="flex justify-center gap-12 relative max-w-7xl mx-auto px-6">
           {/* Edit Profile Card - Left Side */}
           <div className="w-full max-w-md">
