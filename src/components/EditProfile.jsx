@@ -6,6 +6,7 @@ import { addUser } from '../utils/userSlice'
 import { BASE_URL } from '../utils/constants'
 
 const EditProfile = ({ user }) => {
+  const { _id } = user;
   const [firstName, setfirstName] = useState(user.firstName || '')
   const [lastName, setlastName] = useState(user.lastName || '')
   const [photoUrl, setphotoUrl] = useState(user.photoUrl || '')
@@ -245,6 +246,7 @@ const EditProfile = ({ user }) => {
                 Preview
               </h3>
               <UserCard user={{
+                _id,
                 firstName,
                 lastName,
                 photoUrl,
