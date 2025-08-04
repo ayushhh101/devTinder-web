@@ -1,16 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { BASE_URL } from '../utils/constants'
 import axios from 'axios'
 import { removeUser } from '../utils/userSlice'
 import '../components-css/Navbar.css'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 const Navbar = () => {
-
   const user = useSelector(store => store.user)
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async() => {
     try {
@@ -25,81 +26,124 @@ const Navbar = () => {
   }
   
   return (  
-    <div className="navbar bg-gradient-to-r from-indigo-600 to-purple-600 border-b border-indigo-500/30 shadow-xl px-6 py-4">
-      <div className="flex-1">
+   <nav className="bg-[#17b3c9] border-b border-[#c8e6ed] shadow-xl">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+        {/* Brand */}
         <Link
           to="/feed"
           className="text-2xl font-bold text-white tracking-tight hover:text-orange-300 transition duration-200"
         >
           DevTinder
         </Link>
+
+        {/* Hamburger menu for mobile */}
+        <button
+          className="md:hidden focus:outline-none"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          {menuOpen
+            ? <XMarkIcon className="h-7 w-7 text-white" />
+            : <Bars3Icon className="h-7 w-7 text-white" />
+          }
+        </button>
+
+        {/* Desktop Links */}
+        {user && (
+          <div className="hidden md:flex items-center gap-6">
+            <span className="text-sm font-medium text-[#eefcf9] whitespace-nowrap">
+              Welcome, <span className="text-white font-semibold">{user.firstName}</span>
+            </span>
+            <div className="relative group">
+              <button className="btn btn-ghost btn-circle avatar p-0 hover:bg-white/10 transition">
+                <div className="w-10 h-10 rounded-full border-2 border-[#c8e6ed] hover:border-orange-400 transition">
+                  <img
+                    alt="User Avatar"
+                    src={user.photoUrl}
+                    className="object-cover w-full h-full rounded-full"
+                  />
+                </div>
+              </button>
+              <ul className="absolute right-0 mt-0 w-48 bg-white border border-[#c8e6ed] rounded-xl shadow-2xl p-2.5 z-50 group-hover:opacity-100 group-hover:pointer-events-auto space-y-2">
+                <li>
+                  <Link
+                    to="/profile"
+                    className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+                  >
+                    Profile
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/connections"
+                    className="hover:bg-[#f3f7fa] hover:text-[#21d8d8] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+                  >
+                    Connections
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/requests"
+                    className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+                  >
+                    Requests
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left hover:bg-red-100 hover:text-red-500 transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
 
-      {user && (
-        <div className="flex-none flex items-center gap-6">
-          <p className="text-sm font-medium text-indigo-100">
-            Welcome, <span className="text-white font-semibold">{user.firstName}</span>
-          </p>
-
-          <div className="dropdown dropdown-end relative">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle avatar p-0 hover:bg-white/10 transition duration-200"
+      {/* Mobile menu (only appears when menuOpen) */}
+      {user && menuOpen && (
+        <div className="md:hidden px-4 pb-4">
+          <div className="bg-white rounded-xl border border-[#c8e6ed] shadow-xl p-4 flex flex-col gap-2">
+            <span className="text-sm font-medium text-[#11778a] mb-2">
+              Welcome, <span className="text-[#17b3c9] font-semibold">{user.firstName}</span>
+            </span>
+            <Link
+              to="/profile"
+              className="flex justify-between items-center hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+              onClick={() => setMenuOpen(false)}
             >
-              <div className="w-10 h-10 rounded-full border-2 border-white/30 hover:border-orange-400 transition duration-200">
-                <img
-                  alt="User Avatar"
-                  src={user.photoUrl}
-                  className="object-cover w-full h-full rounded-full"
-                />
-              </div>
-            </div>
-
-            <ul
-              tabIndex={0}
-              className="dropdown-content menu bg-slate-800 border border-indigo-500/30 rounded-xl shadow-2xl mt-2 w-48 p-2 z-50"
+              Profile
+              <span className="bg-orange-400 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                New
+              </span>
+            </Link>
+            <Link
+              to="/connections"
+              className="hover:bg-[#f3f7fa] hover:text-[#21d8d8] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+              onClick={() => setMenuOpen(false)}
             >
-              <li>
-                <Link 
-                  to="/profile" 
-                  className="flex justify-between items-center hover:bg-indigo-600/20 hover:text-indigo-300 transition duration-200 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300"
-                >
-                  Profile 
-                  <span className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                    New
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/connections" 
-                  className="hover:bg-purple-600/20 hover:text-purple-300 transition duration-200 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300"
-                >
-                  Connections
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/requests" 
-                  className="hover:bg-indigo-600/20 hover:text-indigo-300 transition duration-200 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300"
-                >
-                  Requests
-                </Link>
-              </li>
-              <li>
-                <button 
-                  onClick={handleLogout} 
-                  className="w-full text-left hover:bg-red-500/20 hover:text-red-300 transition duration-200 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300"
-                >
-                  Logout
-                </button>
-              </li>
-            </ul>
+              Connections
+            </Link>
+            <Link
+              to="/requests"
+              className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+              onClick={() => setMenuOpen(false)}
+            >
+              Requests
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="w-full text-left hover:bg-red-100 hover:text-red-500 transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+            >
+              Logout
+            </button>
           </div>
         </div>
       )}
-    </div>
+    </nav>
   )
 }
 

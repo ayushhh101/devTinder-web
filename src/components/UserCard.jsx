@@ -4,6 +4,7 @@ import { BASE_URL } from '../utils/constants';
 import { useDispatch } from 'react-redux';
 import { removeUserFromFeed } from '../utils/feedSlice';
 import '../components-css/UserCard.css';
+import { Link } from 'react-router-dom';
 
 const UserCard = ({ user }) => {
   console.log(user);
@@ -113,6 +114,8 @@ const UserCard = ({ user }) => {
               </a>
             )}
           </div>
+          <Link to={`/profile/${user._id}`} className="text-indigo-600 font-semibold hover:underline">View Full Profile</Link>
+
           {/* Buttons */}
           <div className="flex gap-4 mt-4">
             <button

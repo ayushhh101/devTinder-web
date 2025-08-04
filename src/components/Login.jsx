@@ -43,121 +43,109 @@ const Login = () => {
       dispatch(addUser(res.data.data))
       navigate('/profile')
     } catch (error) {
-      seterror(error?.response?.data?.message || 'Something went wrong'+ error)
+      seterror(error?.response?.data?.message || 'Something went wrong' + error)
     }
   }
 
   return (
-    <div 
-      className='flex justify-center items-center min-h-screen p-4'
-      style={{
-        background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
-      }}
-    >
-      <div className="w-full max-w-md p-8 bg-[#0f172a] bg-opacity-90 backdrop-blur-sm border-2 border-[#8b5cf6] shadow-2xl rounded-2xl hover:shadow-[0_0_40px_rgba(139,92,246,0.3)] transition-all duration-300">
-        
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold text-[#f97316] mb-2 drop-shadow-lg">
-            {isLoginForm ? "Welcome Back!" : "Join DevTinder"}
-          </h2>
-          <p className="text-gray-300 text-sm">
-            {isLoginForm ? "Sign in to continue your journey" : "Create your account to get started"}
-          </p>
+    <div className="min-h-screen w-full bg-white flex items-center justify-center p-3">
+      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
+        {/* Left illustration / branding section */}
+        <div className="hidden md:flex flex-col items-center justify-center bg-white w-1/2 p-10">
+          {/* Logo */}
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl font-bold text-gray-800">DevTinder</span>
+          </div>
+          {/* Tagline (optional) */}
+          <div className="text-base text-center text-gray-500 px-2">
+            Where developers connect, collaborate, and grow.
+          </div>
         </div>
+        {/* Right login/signup form section */}
+        <div className="flex w-full md:w-1/2 min-h-[450px] items-center justify-center bg-[#f9fafb] relative">
+          <div className="w-full max-w-[370px] mx-auto py-10 px-6 bg-white rounded-2xl shadow border border-zinc-100">
 
-        {/* Form Fields */}
-        <div className="space-y-6">
-          {!isLoginForm && (
-            <>
+            <div className="flex flex-col items-center mb-7">
+              <h2 className="text-2xl font-bold text-[#333333] mb-2 tracking-tight">
+                {isLoginForm ? "Welcome Back" : "Create Account"}
+              </h2>
+              <p className="text-gray-500 text-sm">
+                {isLoginForm
+                  ? "Log in and reconnect with devs"
+                  : "Sign up and join the dev community"}
+              </p>
+            </div>
+
+            <div className="space-y-5">
+              {!isLoginForm && (
+                <>
+                  <div>
+                    <input
+                      type="text"
+                      value={firstName}
+                      className="w-full p-3 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-400 text-gray-700"
+                      placeholder="First Name"
+                      onChange={e => setfirstName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      value={lastName}
+                      className="w-full p-3 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-400 text-gray-700"
+                      placeholder="Last Name"
+                      onChange={e => setlastName(e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
               <div>
-                <label className="block text-[#f97316] font-semibold mb-2 text-sm">
-                  First Name
-                </label>
-                <input 
-                  type="text" 
-                  value={firstName} 
-                  className="w-full p-3 bg-[#1e293b] border-2 border-gray-600 text-white rounded-lg focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6] focus:ring-opacity-50 focus:outline-none transition-all duration-300 placeholder-gray-400"
-                  placeholder="Enter your first name"
-                  onChange={(e) => setfirstName(e.target.value)} 
+                <input
+                  type="email"
+                  value={emailId}
+                  className="w-full p-3 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-400 text-gray-700"
+                  placeholder="Email Address"
+                  onChange={e => setemailId(e.target.value)}
                 />
               </div>
-
               <div>
-                <label className="block text-[#f97316] font-semibold mb-2 text-sm">
-                  Last Name
-                </label>
-                <input 
-                  type="text" 
-                  value={lastName} 
-                  className="w-full p-3 bg-[#1e293b] border-2 border-gray-600 text-white rounded-lg focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6] focus:ring-opacity-50 focus:outline-none transition-all duration-300 placeholder-gray-400"
-                  placeholder="Enter your last name"
-                  onChange={(e) => setlastName(e.target.value)} 
+                <input
+                  type="password"
+                  value={password}
+                  className="w-full p-3 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-400 text-gray-700"
+                  placeholder="Password"
+                  onChange={e => setpassword(e.target.value)}
                 />
               </div>
-            </>
-          )}
-
-          <div>
-            <label className="block text-[#f97316] font-semibold mb-2 text-sm">
-              Email Address
-            </label>
-            <input 
-              type="email" 
-              value={emailId} 
-              className="w-full p-3 bg-[#1e293b] border-2 border-gray-600 text-white rounded-lg focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6] focus:ring-opacity-50 focus:outline-none transition-all duration-300 placeholder-gray-400"
-              placeholder="Enter your email"
-              onChange={(e) => setemailId(e.target.value)} 
-            />
-          </div>
-
-          <div>
-            <label className="block text-[#f97316] font-semibold mb-2 text-sm">
-              Password
-            </label>
-            <input 
-              type="password" 
-              value={password} 
-              className="w-full p-3 bg-[#1e293b] border-2 border-gray-600 text-white rounded-lg focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6] focus:ring-opacity-50 focus:outline-none transition-all duration-300 placeholder-gray-400"
-              placeholder="Enter your password"
-              onChange={(e) => setpassword(e.target.value)} 
-            />
+            </div>
+            {error && (
+              <div className="mt-4 p-2 text-center text-pink-600 text-sm bg-pink-50 rounded-lg border border-pink-300">{error}</div>
+            )}
+            <div className="mt-8">
+              <button
+                className="w-full py-3 bg-[#0099CC] text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 capitalize"
+                onClick={isLoginForm ? handleLogin : handleSignUp}
+              >
+                {isLoginForm ? "Sign In" : "Sign Up"}
+              </button>
+            </div>
+            <div className="mt-6 text-center">
+              <span
+                onClick={() => setisLoginForm(prev => !prev)}
+                className="text-gray-600 hover:text-indigo-500 font-semibold text-sm cursor-pointer transition"
+              >
+                {isLoginForm
+                  ? <>"Don't have an account? <span className="text-[#FF6B6B]">Sign Up</span></>
+                  : (
+                    <>
+                      Already have an account?{" "}
+                      <span className="text-[#FF6B6B]">Sign In</span>
+                    </>
+                  )}
+              </span>
+            </div>
           </div>
         </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className='mt-4 p-3 bg-red-900 bg-opacity-50 border border-red-500 rounded-lg'>
-            <p className='text-center text-red-300 font-medium text-sm'>{error}</p>
-          </div>
-        )}
-
-        {/* Submit Button */}
-        <div className="mt-8">
-          <button 
-            className="w-full py-3 bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] hover:from-[#5855eb] hover:to-[#7c3aed] text-white font-bold rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6] focus:ring-opacity-50"
-            onClick={isLoginForm ? handleLogin : handleSignUp}
-          >
-            {isLoginForm ? "Sign In" : "Create Account"}
-          </button>
-        </div>
-
-        {/* Toggle Form */}
-        <div className="mt-6 text-center">
-          <p 
-            className='text-gray-300 cursor-pointer hover:text-[#f97316] transition-colors duration-300 font-medium'
-            onClick={() => setisLoginForm(!isLoginForm)}
-          >
-            {isLoginForm ? "Don't have an account? " : "Already have an account? "}
-            <span className="text-[#f97316] hover:text-orange-400 font-semibold">
-              {isLoginForm ? "Sign Up" : "Sign In"}
-            </span>
-          </p>
-        </div>
-
-        {/* Decorative Elements */}
-        <div className="absolute -top-4 -left-4 w-8 h-8 bg-[#8b5cf6] rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-4 -right-4 w-6 h-6 bg-[#f97316] rounded-full opacity-30 animate-pulse" style={{animationDelay: '1s'}}></div>
       </div>
     </div>
   )
