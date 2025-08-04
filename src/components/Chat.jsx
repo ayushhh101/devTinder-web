@@ -25,11 +25,14 @@ const Chat = () => {
   const typingTimeoutRef = useRef(null);
   const isTyping = useRef(false);
 
+
   const [isTargetTyping, setIsTargetTyping] = useState(false);
   const [typingUser, setTypingUser] = useState('');
 
   const [onlineStatus, setOnlineStatus] = useState(false);
   const [lastSeen, setLastSeen] = useState(null);
+
+  const [targetUser, setTargetUser] = useState(null);
 
   const getSecretRoomId = async (userId, targetUserId) => {
     const encoder = new TextEncoder();
@@ -44,6 +47,18 @@ const Chat = () => {
 
     return hashHex;
   };
+
+  useEffect(() => {
+    const fetchTargetUser = async () => {
+      try {
+        const { data } = await axios.get(`${BASE_URL}/user/${targetUserId}`, { withCredentials: true });
+        setTargetUser(data); // adjust 'data.data' if your API returns user object differently
+      } catch (error) {
+        setTargetUser(null);
+      }
+    };
+    fetchTargetUser();
+  }, [targetUserId]);
 
 
   const fetchChatMessages = async () => {
@@ -210,96 +225,86 @@ const Chat = () => {
     return `${Math.floor(diffInMinutes / 1440)} days ago`;
   };
 
-  return (
-    <div
-      className='min-h-screen flex items-center justify-center p-4'
-      style={{
-        background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
-      }}
-    >
-      <div className='w-full max-w-4xl h-[80vh] flex flex-col bg-[#0f172a] bg-opacity-90 backdrop-blur-sm border-2 border-[#8b5cf6] rounded-2xl shadow-2xl overflow-hidden'>
+  const appBlue = "#16a3bb";
+  const appPink = "#fc787a";
+  const appBg = "#f6fbff";
 
-        {/* Chat Header */}
-        <div className='p-6 border-b border-[#8b5cf6] bg-gradient-to-r from-[#6366f1] to-[#8b5cf6]'>
-          <div className='flex items-center justify-between'>
-            <h1 className='text-2xl font-bold text-white flex items-center gap-3'>
-              <div className={`w-3 h-3 rounded-full ${onlineStatus ?
-                'bg-green-400 animate-pulse' :
-                'bg-gray-400'
-                }`}></div>
-              Chat with {typingUser || 'User'}
-            </h1>
-            {!onlineStatus && lastSeen && (
-              <span className='text-xs text-white opacity-80'>
-                Last seen {formatLastSeen(lastSeen)}
-              </span>
-            )}
-          </div>
-          {isTargetTyping && (
-            <div className='text-xs text-white opacity-80 mt-1'>
-              {typingUser} is typing...
+  // Scroll to bottom on new message
+  const messagesEndRef = useRef(null);
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isTargetTyping]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-3" style={{ background: "#f6fbff" }}>
+      <div className="w-full max-w-5xl bg-white rounded-3xl border border-[#e4e7ee] shadow-xl flex flex-col h-[85vh] overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#e4e7ee]">
+          <span className="text-2xl font-bold tracking-tight text-[#16a3bb]">
+            {targetUser ? `Chat with ${targetUser.firstName}` : 'Chat'}
+          </span>
+          <div className="flex items-center gap-2">
+            {/* Show avatar initials or icon */}
+            <div className="w-9 h-9 rounded-full bg-[#e4e7ee] flex items-center justify-center text-[#16a3bb] font-bold text-lg">
+              {user.firstName && user.firstName[0]}
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Messages Container */}
-        <div className='flex-1 overflow-y-auto p-6 flex flex-col gap-4 scrollbar-thin scrollbar-thumb-[#8b5cf6] scrollbar-track-transparent'>
-          {messages.map((msg, index) => {
+        <div className="flex-1 px-4 py-3 overflow-y-auto space-y-3 scrollbar-none">
+          {messages.map((msg, idx) => {
             const isCurrentUser = user.firstName === msg.firstName;
             return (
-              <div key={index} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${isCurrentUser
-                  ? 'bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white rounded-br-sm'
-                  : 'bg-[#1e293b] text-white rounded-bl-sm border border-gray-600'
-                  }`}>
-                  <div className={`text-xs font-semibold mb-1 ${isCurrentUser ? 'text-orange-200' : 'text-[#f97316]'
-                    }`}>
-                    {msg.firstName + " " + msg.lastName}
+              <div key={idx} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
+                <div className="flex items-center justify-center gap-2 max-w-[80%]">
+                  {!isCurrentUser && (
+                    <img
+                      src={targetUser.photoUrl}
+                      alt={msg.firstName}
+                      className="w-8 h-8 rounded-full object-cover bg-[#e4e7ee] shadow-sm"
+                    />
+                  )}
+                  <div className={`px-4 py-3 text-[16px] 
+                    ${isCurrentUser
+                      ? 'bg-[#16a3bb] text-white rounded-t-2xl rounded-bl-2xl'
+                      : 'bg-[#f4fafe] text-[#1e293b] rounded-t-2xl rounded-br-2xl border border-[#e4e7ee]'
+                    } shadow-sm`}>
+                    {msg.text}
                   </div>
-                  <div className="text-sm leading-relaxed">{msg.text}</div>
                 </div>
               </div>
-            );
+            )
           })}
-
+          
           {/* Typing Indicator */}
           {isTargetTyping && (
-            <div className='flex justify-start'>
-              <div className='bg-[#1e293b] border border-gray-600 px-4 py-3 rounded-2xl rounded-bl-sm'>
-                <div className='text-[#f97316] text-xs font-semibold mb-1'>
-                  {typingUser}
-                </div>
-                <div className='flex items-center gap-1 text-gray-400'>
-                  <span className='text-sm'>typing</span>
-                  <div className='flex gap-1'>
-                    <div className='w-1 h-1 bg-[#8b5cf6] rounded-full animate-bounce'></div>
-                    <div className='w-1 h-1 bg-[#8b5cf6] rounded-full animate-bounce' style={{ animationDelay: '0.1s' }}></div>
-                    <div className='w-1 h-1 bg-[#8b5cf6] rounded-full animate-bounce' style={{ animationDelay: '0.2s' }}></div>
-                  </div>
-                </div>
-              </div>
+            <div className="flex items-center gap-2 text-sm text-gray-400 pl-3">
+              <span>{typingUser} is typing...</span>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
-        <div className='p-6 border-t border-[#8b5cf6] bg-[#0f172a] bg-opacity-80'>
-          <div className='flex items-center gap-4'>
+        {/* Input Bar */}
+        <div className="px-4 py-4 border-t border-[#e4e7ee] bg-[#f6fbff]">
+          <form className="flex items-center gap-2"
+            onSubmit={e => { e.preventDefault(); sendMessage(); }}>
             <input
               value={newMessage}
               onChange={handleTyping}
-              onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-              placeholder="Type your message..."
-              className='flex-1 bg-[#1e293b] border border-gray-600 text-white rounded-full px-6 py-3 focus:outline-none focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6] focus:ring-opacity-50 placeholder-gray-400 transition-all duration-300'
+              onKeyPress={e => e.key === 'Enter' && sendMessage()}
+              placeholder="Message"
+              className="flex-1 bg-white border border-[#e4e7ee] text-[#1e293b] rounded-full px-5 py-3 text-[16px] placeholder-gray-400 outline-none focus:ring-2 focus:ring-[#16a3bb] focus:border-[#16a3bb] transition"
+              autoComplete="off"
             />
             <button
-              onClick={sendMessage}
+              type="submit"
               disabled={!newMessage.trim()}
-              className='px-6 py-3 bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] hover:from-[#5855eb] hover:to-[#7c3aed] text-white rounded-full font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg hover:shadow-[0_0_20px_rgba(139,92,246,0.5)]'
-            >
-              Send
-            </button>
-          </div>
+              className="px-6 py-3 bg-[#fc787a] hover:bg-[#ff6767] active:bg-[#fa5151] text-white font-bold rounded-full text-base transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >Send</button>
+          </form>
         </div>
       </div>
     </div>
