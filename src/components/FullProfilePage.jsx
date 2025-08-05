@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { BASE_URL } from '../utils/constants';
+import { useSelector } from 'react-redux';
 
 const TABS = ["About", "Skills", "Projects", "Experience"];
 
@@ -10,6 +11,7 @@ const FullProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const { userId } = useParams();
   const [activeTab, setActiveTab] = useState(0);
+  const currentUserId = useSelector(store => store.user?._id);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -45,6 +47,21 @@ const FullProfilePage = () => {
   } = profile;
 
   const bannerImg = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80";
+
+  const completionCriteria = [
+    Boolean(photoUrl && photoUrl.trim() !== ""),
+    Boolean(about && about.trim().length > 30),
+    Boolean(headline && headline.trim() !== ""),
+    Boolean(currentPosition && currentPosition.trim() !== ""),
+    Boolean(location && location.trim() !== ""),
+    Boolean(skills && skills.length > 0),
+    Boolean(projects && projects.length > 0),
+    Boolean(githubUrl && githubUrl.trim().length > 10),  
+    Boolean(linkedinUrl && linkedinUrl.trim().length > 10),
+  ];
+
+  const completed = completionCriteria.filter(Boolean).length;
+  const completionPercent = Math.round((completed / completionCriteria.length) * 100);
 
   return (
     <div className="min-h-screen bg-[#f6fbff] py-10 px-2">
@@ -101,6 +118,25 @@ const FullProfilePage = () => {
             }
           </div>
         </div>
+        {/* Profile Completion Progress Bar */}
+        {currentUserId === userId && (
+        <div className="mx-auto w-[90%] mb-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-semibold text-[#1790a7] tracking-wide uppercase">
+              Profile Completion
+            </span>
+            <span className="text-xs font-medium text-[#fc787a]">
+              {completionPercent}%
+            </span>
+          </div>
+          <div className="w-full h-3 bg-[#e4e7ee] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[#0099CC] rounded-full transition-all duration-500"
+              style={{ width: `${completionPercent}%` }}
+            />
+          </div>
+        </div>
+        )}
 
         {/* Tabs */}
         <div className="border-b border-[#e4e7ee] px-7 flex justify-between gap-8 ml-10 mr-10">
@@ -119,6 +155,7 @@ const FullProfilePage = () => {
             </button>
           ))}
         </div>
+
 
         {/* Tab Contents */}
         <div className="px-7 pt-6 pb-3 min-h-[180px] ml-10 ">

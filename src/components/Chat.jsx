@@ -94,8 +94,6 @@ const Chat = () => {
 
     const socket = createSocketConnection()
     socketRef.current = socket
-    //As soon as the page loads , the socket connection is made and joinChat event is emitted
-    const roomId = getSecretRoomId(userId, targetUserId);
     socket.emit('joinChat', { firstName: user.firstName, userId, targetUserId })
 
     socket.on('messageReceived', ({ firstName, lastName, text }) => {
@@ -120,7 +118,6 @@ const Chat = () => {
       clearTimeout(typingTimeoutRef.current);
     });
 
-    // Status tracking
     socket.on('userStatusResponse', ({ status, lastSeen }) => {
       setOnlineStatus(status === 'online');
       if (lastSeen) setLastSeen(new Date(lastSeen));
@@ -133,7 +130,6 @@ const Chat = () => {
       }
     });
 
-    // Set initial status
     socket.emit('setOnline', userId);
     socket.emit('getUserStatus', targetUserId);
 
