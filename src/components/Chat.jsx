@@ -245,11 +245,20 @@ const Chat = () => {
           <span className="text-2xl font-bold tracking-tight text-[#16a3bb]">
             {targetUser ? `Chat with ${targetUser.firstName}` : 'Chat'}
           </span>
+          <div className='flex flex-row justify-center items-center'>
+          <span className="text-sm text-gray-500">
+            {onlineStatus
+              ? <span className="text-green-500 font-semibold">Online</span>
+              : targetUser?.lastSeen
+                ? `Last seen ${formatLastSeen(new Date(targetUser.lastSeen))}`
+                : ''}
+          </span>
           <div className="flex items-center gap-2">
             {/* Show avatar initials or icon */}
             <div className="w-9 h-9 rounded-full bg-[#e4e7ee] flex items-center justify-center text-[#16a3bb] font-bold text-lg">
               {user.firstName && user.firstName[0]}
             </div>
+          </div>
           </div>
         </div>
 
@@ -277,7 +286,7 @@ const Chat = () => {
               </div>
             )
           })}
-          
+
           {/* Typing Indicator */}
           {isTargetTyping && (
             <div className="flex items-center gap-2 text-sm text-gray-400 pl-3">
