@@ -50,7 +50,7 @@ const Connections = () => {
     }
 
     return () => socket.disconnect()
-  }, [connections])
+  }, [user._id,connections])
 
   if (!connections) return null
   if (connections.length === 0) return <div>No connections</div>
@@ -67,16 +67,20 @@ const Connections = () => {
               className="w-full bg-white rounded-2xl border border-[#e4e7ee] shadow-sm px-4 py-5 mb-6 flex items-center gap-6"
             >
               {/* Avatar + Online Dot */}
-              <div className="relative flex-shrink-0 w-16 h-16 bg-[#f1f5f9] rounded-full flex items-center justify-center overflow-hidden">
-                <img src={photoUrl} alt={firstName} className="object-cover w-full h-full rounded-full" />
-                {onlineUserIds.includes(_id) && (
-                  <span className="absolute bottom-1.5 right-1.5 block w-4 h-4 bg-green-500 border-2 border-white rounded-full shadow"></span>
-                )}
-              </div>
+              <Link to={`/profile/${_id}`}>
+                <div className="relative flex-shrink-0 w-16 h-16 bg-[#f1f5f9] rounded-full flex items-center justify-center overflow-hidden">
+                  <img src={photoUrl} alt={firstName} className="object-cover w-full h-full rounded-full" />
+                  {onlineUserIds.includes(_id) && (
+                    <span className="absolute bottom-1.5 right-1.5 block w-4 h-4 bg-green-500 border-2 border-white rounded-full shadow"></span>
+                  )}
+                </div>
+              </Link>
               {/* Text Content */}
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-lg font-bold text-[#1790a7]">{firstName + " " + lastName}</span>
+                  <Link to={`/profile/${_id}`} className="hover:underline">
+                    <span className="text-lg font-bold text-[#1790a7]">{firstName + " " + lastName}</span>
+                  </Link>
                   <span className="text-sm text-gray-400 font-medium">
                     {age ? `• ${age}` : ""} {gender && `• ${gender}`}
                   </span>

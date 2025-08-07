@@ -24,8 +24,6 @@ const Chat = () => {
   const socketRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const isTyping = useRef(false);
-
-
   const [isTargetTyping, setIsTargetTyping] = useState(false);
   const [typingUser, setTypingUser] = useState('');
 
@@ -48,6 +46,17 @@ const Chat = () => {
     return hashHex;
   };
 
+  const [inCall, setInCall] = useState(false)
+  const [callStartedByMe, setCallStartedByMe] = useState(false)
+  const [callRinging, setCallRinging] = useState(false)
+  const [remoteUserName, setRemoteUserName] = useState('')
+  const localVideoRef = useRef(null)
+  const remoteVideoRef = useRef(null)
+  const localStreamRef = useRef(null)
+  const peerConnectionRef = useRef(null)
+  // STUN public Google
+  const ICE_SERVERS = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
+
   useEffect(() => {
     const fetchTargetUser = async () => {
       try {
@@ -59,7 +68,6 @@ const Chat = () => {
     };
     fetchTargetUser();
   }, [targetUserId]);
-
 
   const fetchChatMessages = async () => {
     try {
@@ -233,6 +241,105 @@ const Chat = () => {
     }
   }, [messages, isTargetTyping]);
 
+  useEffect(() => {
+    if (!socketRef.current) return
+    // Listen for signaling events
+    
+    socketRef.current.on("video-offer", async ({ offer, from }) => {
+      setRemoteUserName(from.firstName)
+      if (!peerConnectionRef.current) createPeerConnection()
+      await peerConnectionRef.current.setRemoteDescription(offer)
+      // Get local stream and add tracks
+      const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      localStreamRef.current = localStream
+      localVideoRef.current.srcObject = localStream
+      localStream.getTracks().forEach(track =>
+        peerConnectionRef.current.addTrack(track, localStream)
+      )
+      // Create and send answer
+      const answer = await peerConnectionRef.current.createAnswer()
+      await peerConnectionRef.current.setLocalDescription(answer)
+      socketRef.current.emit('video-answer', {
+        targetUserId,
+        answer: peerConnectionRef.current.localDescription,
+        from: { firstName: user.firstName, userId }
+      })
+      setInCall(true)
+      setCallRinging(false)
+    })
+
+    socketRef.current.on("video-answer", async ({ answer }) => {
+      // Receiving answer — caller
+      if (peerConnectionRef.current) {
+        await peerConnectionRef.current.setRemoteDescription(answer)
+        setInCall(true)
+        setCallRinging(false)
+      }
+    })
+
+    socketRef.current.on("ice-candidate", ({ candidate }) => {
+      if (peerConnectionRef.current && candidate) {
+        peerConnectionRef.current.addIceCandidate(candidate)
+      }
+    })
+
+    // Optional: handle call hang-up events
+
+    return () => {
+      // Remove listeners if needed
+      socketRef.current.off("video-offer")
+      socketRef.current.off("video-answer")
+      socketRef.current.off("ice-candidate")
+    }
+  }, [targetUserId, userId])
+
+  //webrtc logics
+  const createPeerConnection = () => {
+    const pc = new window.RTCPeerConnection(ICE_SERVERS)
+    pc.onicecandidate = e => {
+      if (e.candidate) {
+        socketRef.current.emit("ice-candidate", {
+          targetUserId, candidate: e.candidate, from: { userId, firstName: user.firstName }
+        })
+      }
+    }
+    pc.ontrack = e => {
+      // Attach remote stream
+      if (remoteVideoRef.current) remoteVideoRef.current.srcObject = e.streams[0]
+    }
+    peerConnectionRef.current = pc
+    return pc
+  }
+
+  const startCall = async () => {
+    setCallStartedByMe(true); setCallRinging(true)
+    if (!peerConnectionRef.current) createPeerConnection()
+    // Get local video/audio
+    const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    localStreamRef.current = localStream
+    localVideoRef.current.srcObject = localStream
+    localStream.getTracks().forEach(track => {
+      peerConnectionRef.current.addTrack(track, localStream)
+    })
+    // Make offer
+    const offer = await peerConnectionRef.current.createOffer()
+    await peerConnectionRef.current.setLocalDescription(offer)
+    socketRef.current.emit("video-offer", {
+      targetUserId,
+      offer: peerConnectionRef.current.localDescription,
+      from: { firstName: user.firstName, userId }
+    })
+  }
+
+  const hangUp = () => {
+    // Stop video, close connection
+    if (localStreamRef.current) localStreamRef.current.getTracks().forEach(t => t.stop())
+    if (peerConnectionRef.current) peerConnectionRef.current.close()
+    peerConnectionRef.current = null
+    setInCall(false); setCallRinging(false); setCallStartedByMe(false)
+    // Optional: emit hangup event to other side and handle 
+  }
+  
   return (
     <div className="min-h-screen flex items-center justify-center p-3" style={{ background: "#f6fbff" }}>
       <div className="w-full max-w-5xl bg-white rounded-3xl border border-[#e4e7ee] shadow-xl flex flex-col h-[85vh] overflow-hidden">
@@ -242,21 +349,45 @@ const Chat = () => {
             {targetUser ? `Chat with ${targetUser.firstName}` : 'Chat'}
           </span>
           <div className='flex flex-row justify-center items-center'>
-          <span className="text-sm text-gray-500">
-            {onlineStatus
-              ? <span className="text-green-500 font-semibold">Online</span>
-              : targetUser?.lastSeen
-                ? `Last seen ${formatLastSeen(new Date(targetUser.lastSeen))}`
-                : ''}
-          </span>
-          <div className="flex items-center gap-2">
-            {/* Show avatar initials or icon */}
-            <div className="w-9 h-9 rounded-full bg-[#e4e7ee] flex items-center justify-center text-[#16a3bb] font-bold text-lg">
-              {user.firstName && user.firstName[0]}
+             <button
+              onClick={startCall}
+              className="bg-[#16a3bb] text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-[#1294a6] transition"
+              disabled={inCall || callRinging}
+            >📹 Video Call</button>
+            <span className="text-sm text-gray-500">
+              {onlineStatus
+                ? <span className="text-green-500 font-semibold">Online</span>
+                : targetUser?.lastSeen
+                  ? `Last seen ${formatLastSeen(new Date(targetUser.lastSeen))}`
+                  : ''}
+            </span>
+            <div className="flex items-center gap-2">
+              {/* Show avatar initials or icon */}
+              <div className="w-9 h-9 rounded-full bg-[#e4e7ee] flex items-center justify-center text-[#16a3bb] font-bold text-lg">
+                {user.firstName && user.firstName[0]}
+              </div>
             </div>
           </div>
-          </div>
         </div>
+
+         {/* VIDEO CALL UI */}
+        {(inCall || callRinging) && (
+          <div className="p-4 border-b border-[#e4e7ee] flex flex-col items-center">
+            <div className="text-lg font-semibold mb-2">
+              {callRinging && callStartedByMe && "Calling..."}
+              {callRinging && !callStartedByMe && "Incoming call..."}
+              {inCall && "In Video Call"}
+            </div>
+            <div className="flex gap-3 justify-center items-center">
+              <video ref={localVideoRef} autoPlay muted className="w-56 h-40 bg-[#e6e6e6] rounded-xl border-2" />
+              <video ref={remoteVideoRef} autoPlay className="w-56 h-40 bg-[#e0ffe6] rounded-xl border-2" />
+            </div>
+            <button
+              className="mt-3 bg-[#fc787a] text-white px-5 py-2 rounded-lg shadow hover:bg-[#fa5151] font-semibold"
+              onClick={hangUp}
+            >End Call</button>
+          </div>
+        )}
 
         <div className="flex-1 px-4 py-3 overflow-y-auto space-y-3 scrollbar-none">
           {messages.map((msg, idx) => {
