@@ -11,12 +11,17 @@ import Chat from "./components/Chat"
 import './App.css'
 import ProfileSearch from "./components/ProfileSearch"
 import FullProfilePage from "./components/FullProfilePage"
+import NotificationListener from "./components/NotificationListener"
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
 
   return (
     <>
       <Provider store={appStore}>
+        <NotificationListener />
+        <ToastContainer position="top-right" autoClose={4000} />
         <BrowserRouter basename="/">
           <Routes>
             {/* Parent Route */}

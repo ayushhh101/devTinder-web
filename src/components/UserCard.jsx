@@ -1,16 +1,19 @@
 import axios from 'axios';
 import React from 'react';
 import { BASE_URL } from '../utils/constants';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { removeUserFromFeed } from '../utils/feedSlice';
 import '../components-css/UserCard.css';
 import { Link } from 'react-router-dom';
+import { globalSocket } from './NotificationListener';
 
 const UserCard = ({ user }) => {
   console.log(user);
   const dispatch = useDispatch();
+  const currentUser = useSelector(state => state.user);
+
   const {
-    _id,
+    _id: targetUserId,
     firstName,
     lastName,
     photoUrl = '',
@@ -30,6 +33,15 @@ const UserCard = ({ user }) => {
     try {
       const res = await axios.post(`${BASE_URL}/request/send/${status}/${userId}`, {}, { withCredentials: true });
       dispatch(removeUserFromFeed(userId));
+
+       if (status === 'interested' && globalSocket) {
+        globalSocket.emit('sendConnectionRequestNotification', {
+          fromUserId: currentUser._id,
+          toUserId: userId, 
+          firstName: currentUser.firstName,
+          lastName: currentUser.lastName
+        });
+      }
       console.log(res);
     } catch (error) {
       console.log(error);
@@ -111,14 +123,14 @@ const UserCard = ({ user }) => {
           <div className="flex justify-center gap-32 mt-4">
             <button
               className="w-16 h-16 rounded-full flex justify-center items-center bg-[#f0f3f7] hover:bg-[#e3eaf6] transition shadow border-2 border-[#e3eaf6] text-2xl"
-              onClick={() => handleSendRequest('ignored', _id)}
+              onClick={() => handleSendRequest('ignored', targetUserId)}
               aria-label="Ignore user"
             >
               <i className="ri-close-line"></i>
             </button>
             <button
               className="w-16 h-16 rounded-full flex justify-center items-center bg-[#FF6B6B]  text-white text-2xl font-bold shadow-xl hover:scale-105 active:scale-100 transition-transform"
-              onClick={() => handleSendRequest('interested', _id)}
+              onClick={() => handleSendRequest('interested', targetUserId)}
               aria-label="Connect with user"
             >
               <i className="ri-heart-2-fill"></i>

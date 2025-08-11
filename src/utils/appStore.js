@@ -3,6 +3,7 @@ import userReducer from "./userSlice";
 import feedReducer from "./feedSlice";
 import connectionReducer from "./connectionSlice";
 import requestReducer from "./requestSlice";
+import notificationsReducer from "./addNotification";
 
 const appStore = configureStore({
   reducer: {
@@ -10,7 +11,8 @@ const appStore = configureStore({
     user: userReducer,
     feed: feedReducer,
     connections : connectionReducer,
-    requests: requestReducer
+    requests: requestReducer,
+    notifications: notificationsReducer
   },
 })
 

@@ -3,17 +3,27 @@ import React, { useEffect } from 'react'
 import { BASE_URL } from '../utils/constants'
 import { useDispatch, useSelector } from 'react-redux'
 import { addRequests, removeRequest } from '../utils/requestSlice'
+import { globalSocket } from './NotificationListener';
 
 const Requests = () => {
   const dispatch = useDispatch()
   const requests = useSelector(state => state.requests)
+  const user = useSelector(state => state.user);
 
-  const reviewRequest = async (status, _id) => {
+  const reviewRequest = async (status, request) => {
     try {
-      const res = await axios.post(`${BASE_URL}/request/review/${status}/${_id}`, {},
+      const res = await axios.post(`${BASE_URL}/request/review/${status}/${request._id}`, {},
         { withCredentials: true })
-      dispatch(removeRequest(_id))
+      dispatch(removeRequest(request._id))
 
+      if (status === 'accepted' && globalSocket) {
+        globalSocket.emit('sendConnectionAcceptedNotification', {
+          fromUserId: user._id,
+          toUserId: request.fromUserId._id,
+          firstName: user.firstName,
+          lastName: user.lastName
+        });
+      }
       console.log(res)
     } catch (error) {
       console.log(error)
@@ -35,13 +45,9 @@ const Requests = () => {
     fetchRequests()
   }, [])
 
-  if (!requests) {
-    return
-  }
+  if (!requests) return null
 
-  if (requests.length === 0) {
-    return <div>No Requests</div>
-  }
+  if (requests.length === 0) return <div>No Requests</div>
 
   return (
     <div className='flex flex-col items-center min-h-screen py-10 bg-white'>
@@ -88,13 +94,13 @@ const Requests = () => {
               <div className="flex gap-4">
                 <button
                   className="px-4 py-2 bg-[#eef2f6] text-[#657084] font-medium rounded-full shadow-none border border-[#e4e7ee] hover:bg-[#e3eaf6] transition text-[15px]"
-                  onClick={() => reviewRequest("rejected", request._id)}
+                  onClick={() => reviewRequest("rejected", request)}
                 >
                   ❌ Reject
                 </button>
                 <button
                   className="px-4 py-2 bg-[#ff6767] text-white font-medium rounded-full shadow-none border border-[#faeded] hover:bg-[#fd4e5c] transition text-[15px]"
-                  onClick={() => reviewRequest("accepted", request._id)}
+                  onClick={() => reviewRequest("accepted", request)}
                 >
                   ✅ Accept
                 </button>
