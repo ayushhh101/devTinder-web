@@ -14,6 +14,7 @@ import FullProfilePage from "./components/FullProfilePage"
 import NotificationListener from "./components/NotificationListener"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import NotificationCenter from "./components/NotificationCenter"
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
             {/* Parent Route */}
             <Route path="/" element={<Body />}>
               {/* Children Routes */}
+              <Route path="/notifications" element={<NotificationCenter />} />
               <Route path="/feed" element={<Feed />} />
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />

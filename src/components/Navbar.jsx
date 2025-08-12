@@ -12,6 +12,9 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const unreadCount = useSelector(
+    state => state.notifications.filter(n => !n.read).length
+  );
 
   const handleLogout = async () => {
     try {
@@ -97,6 +100,17 @@ const Navbar = () => {
                     Search Profiles
                   </Link>
                 </li>
+                <li className="relative">
+                  <Link to="/notifications" className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-xl px-3 py-2.5 text-sm font-medium text-[#147687]">
+                    Notifications
+                    {unreadCount > 0 && (
+                      <span className="absolute ml-2 bg-red-500 text-white text-xs px-1 rounded-full">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+
                 <li>
                   <button
                     onClick={handleLogout}
@@ -148,6 +162,18 @@ const Navbar = () => {
               onClick={() => setMenuOpen(false)}
             >
               Search Profiles
+            </Link>
+            <Link
+              to="/notifications"
+              className="flex justify-between items-center hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687] relative"
+              onClick={() => setMenuOpen(false)}
+            >
+              Notifications
+              {unreadCount > 0 && (
+                <span className="absolute ml-24 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
             <button
               onClick={handleLogout}
