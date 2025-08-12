@@ -39,7 +39,6 @@ const Login = () => {
         emailId,
         password
       }, { withCredentials: true });
-
       dispatch(addUser(res.data.data))
       navigate('/profile')
     } catch (error) {
@@ -48,28 +47,24 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-white flex items-center justify-center p-3">
+    <div className="min-h-screen w-full bg-white flex items-center justify-center font-alibaba px-4">
       <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
         {/* Left illustration / branding section */}
-        <div className="hidden md:flex flex-col items-center justify-center bg-white w-1/2 p-10">
-          {/* Logo */}
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl font-bold text-gray-800">DevTinder</span>
-          </div>
-          {/* Tagline (optional) */}
-          <div className="text-base text-center text-gray-500 px-2">
+        <div className="hidden md:flex flex-col items-center justify-center bg-[#F5F7FA] w-1/2 p-10">
+          <h1 className="font-bold text-[44px] text-textPrimary">DevTinder</h1>
+          <p className="text-center text-lg text-textPrimary max-w-xs mt-3">
             Where developers connect, collaborate, and grow.
-          </div>
+          </p>
         </div>
         {/* Right login/signup form section */}
-        <div className="flex w-full md:w-1/2 min-h-[450px] items-center justify-center bg-[#f9fafb] relative">
-          <div className="w-full max-w-[370px] mx-auto py-10 px-6 bg-white rounded-2xl shadow border border-zinc-100">
+        <div className="flex w-full md:w-1/2 min-h-[450px] items-center justify-center bg-white relative">
+          <div className="w-full max-w-[370px] mx-auto py-10 px-6 bg-white rounded-2xl shadow border border-[#F5F7FA]">
 
             <div className="flex flex-col items-center mb-7">
-              <h2 className="text-2xl font-bold text-[#333333] mb-2 tracking-tight">
+              <h2 className="text-[32px] font-bold text-textPrimary mb-2 tracking-tight">
                 {isLoginForm ? "Welcome Back" : "Create Account"}
               </h2>
-              <p className="text-gray-500 text-sm">
+              <p className="text-textPrimary text-sm">
                 {isLoginForm
                   ? "Log in and reconnect with devs"
                   : "Sign up and join the dev community"}
@@ -83,7 +78,7 @@ const Login = () => {
                     <input
                       type="text"
                       value={firstName}
-                      className="w-full p-3 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-400 text-gray-700"
+                      className="w-full p-4 bg-white border border-gray-200 rounded-[12px] focus:outline-none focus:border-[#0099CC] text-[#333] text-lg"
                       placeholder="First Name"
                       onChange={e => setfirstName(e.target.value)}
                     />
@@ -92,7 +87,7 @@ const Login = () => {
                     <input
                       type="text"
                       value={lastName}
-                      className="w-full p-3 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-400 text-gray-700"
+                      className="w-full p-4 bg-white border border-gray-200 rounded-[12px] focus:outline-none focus:border-[#0099CC] text-[#333] text-lg"
                       placeholder="Last Name"
                       onChange={e => setlastName(e.target.value)}
                     />
@@ -103,7 +98,7 @@ const Login = () => {
                 <input
                   type="email"
                   value={emailId}
-                  className="w-full p-3 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-400 text-gray-700"
+                  className="w-full p-4 bg-white border border-gray-200 rounded-[12px] focus:outline-none focus:border-[#0099CC] text-[#333] text-lg"
                   placeholder="Email Address"
                   onChange={e => setemailId(e.target.value)}
                 />
@@ -112,7 +107,7 @@ const Login = () => {
                 <input
                   type="password"
                   value={password}
-                  className="w-full p-3 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:border-indigo-400 text-gray-700"
+                  className="w-full p-4 bg-white border border-gray-200 rounded-[12px] focus:outline-none focus:border-[#0099CC] text-[#333] text-lg"
                   placeholder="Password"
                   onChange={e => setpassword(e.target.value)}
                 />
@@ -123,7 +118,7 @@ const Login = () => {
             )}
             <div className="mt-8">
               <button
-                className="w-full py-3 bg-[#0099CC] text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 capitalize"
+                className="w-full py-3 rounded-[12px] font-bold text-lg shadow-md hover:shadow-lg transition-all bg-primary text-white hover:bg-[#007aa3]"
                 onClick={isLoginForm ? handleLogin : handleSignUp}
               >
                 {isLoginForm ? "Sign In" : "Sign Up"}
@@ -132,10 +127,10 @@ const Login = () => {
             <div className="mt-6 text-center">
               <span
                 onClick={() => setisLoginForm(prev => !prev)}
-                className="text-gray-600 hover:text-indigo-500 font-semibold text-sm cursor-pointer transition"
+                className="text-[#333] font-semibold text-base cursor-pointer"
               >
                 {isLoginForm
-                  ? <>"Don't have an account? <span className="text-[#FF6B6B]">Sign Up</span></>
+                  ? <>Don't have an account? <span className="text-[#FF6B6B]">Sign Up</span></>
                   : (
                     <>
                       Already have an account?{" "}
