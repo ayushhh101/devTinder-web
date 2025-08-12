@@ -50,73 +50,105 @@ const ProfileSearch = () => {
   };
 
   return (
-   <div className="min-h-screen w-full px-2 pt-8 pb-12 bg-gradient-to-tr from-indigo-50 from-40% via-purple-50 to-blue-100">
-      <div className="max-w-5xl mx-auto">
-        <h2 className="text-2xl font-extrabold text-indigo-800 mb-4 text-center">Find Professionals</h2>
+  <div className="min-h-screen w-full bg-white py-10 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Title */}
+        <h2 className="text-3xl font-bold text-[#0099CC] mb-8 text-center ">
+          Find Developers & Professionals
+        </h2>
+
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 bg-white/70 p-5 rounded-2xl border border-indigo-200 shadow">
-          <input
-            name="name"
-            placeholder="Name"
-            value={filters.name}
-            onChange={handleInputChange}
-            className="px-4 py-2 rounded-md border border-indigo-200 shadow focus:outline-indigo-300"
-          />
-          <input
-            name="skills"
-            placeholder="Skills (comma separated)"
-            value={filters.skills}
-            onChange={handleInputChange}
-            className="px-4 py-2 rounded-md border border-indigo-200 shadow focus:outline-indigo-300"
-          />
-          <input
-            name="location"
-            placeholder="Location"
-            value={filters.location}
-            onChange={handleInputChange}
-            className="px-4 py-2 rounded-md border border-indigo-200 shadow focus:outline-indigo-300"
-          />
-          <input
-            name="headline"
-            placeholder="Headline"
-            value={filters.headline}
-            onChange={handleInputChange}
-            className="px-4 py-2 rounded-md border border-indigo-200 shadow focus:outline-indigo-300"
-          />
-          <input
-            name="currentPosition"
-            placeholder="Position"
-            value={filters.currentPosition}
-            onChange={handleInputChange}
-            className="px-4 py-2 rounded-md border border-indigo-200 shadow focus:outline-indigo-300"
-          />
-          <button
-            onClick={handleSearch}
-            className="col-span-1 md:col-span-3 mt-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-orange-400 text-white font-bold py-2 rounded-md shadow transition hover:shadow-lg hover:from-indigo-700"
-          >Search</button>
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input
+              name="name"
+              placeholder="Name"
+              value={filters.name}
+              onChange={handleInputChange}
+              className="px-4 py-2 rounded-xl border border-gray-300 bg-gray-100 focus:outline-none focus:border-[#0099CC] focus:ring-2 focus:ring-[#0099CC] text-gray-700"
+            />
+            <input
+              name="skills"
+              placeholder="Skills (comma separated)"
+              value={filters.skills}
+              onChange={handleInputChange}
+              className="px-4 py-2 rounded-xl border border-gray-300 bg-gray-100 focus:outline-none focus:border-[#0099CC] focus:ring-2 focus:ring-[#0099CC] text-gray-700"
+            />
+            <input
+              name="location"
+              placeholder="Location"
+              value={filters.location}
+              onChange={handleInputChange}
+              className="px-4 py-2 rounded-xl border border-gray-300 bg-gray-100 focus:outline-none focus:border-[#0099CC] focus:ring-2 focus:ring-[#0099CC] text-gray-700"
+            />
+            <input
+              name="headline"
+              placeholder="Headline"
+              value={filters.headline}
+              onChange={handleInputChange}
+              className="px-4 py-2 rounded-xl border border-gray-300 bg-gray-100 focus:outline-none focus:border-[#0099CC] focus:ring-2 focus:ring-[#0099CC] text-gray-700"
+            />
+            <input
+              name="currentPosition"
+              placeholder="Position"
+              value={filters.currentPosition}
+              onChange={handleInputChange}
+              className="px-4 py-2 rounded-xl border border-gray-300 bg-gray-100 focus:outline-none focus:border-[#0099CC] focus:ring-2 focus:ring-[#0099CC] text-gray-700"
+            />
+            <button
+              onClick={handleSearch}
+              className="col-span-1 md:col-span-3 mt-2 py-2 rounded-xl bg-[#0099CC] text-white font-semibold shadow hover:bg-[#007ea8] transition-all"
+            >
+              Search
+            </button>
+          </div>
         </div>
+
         {/* Message */}
-        {loading && <p className="text-center text-lg text-indigo-600 mt-10">Loading...</p>}
+        {loading && <p className="text-center text-lg text-[#0099CC] mt-10">Loading...</p>}
         {error && <p className="text-center text-base text-red-500 mb-4">{error}</p>}
-        {/* Cards Grid */}
+
+        {/* Results */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-6">
-          {results.length === 0 && !loading ?
-            <p className="col-span-full text-center text-lg text-slate-500">No profiles found</p> :
+          {results.length === 0 && !loading ? (
+            <p className="col-span-full text-center text-lg text-gray-500">
+              No profiles found
+            </p>
+          ) : (
             results.map(user => (
-              <UserCard key={user._id} user={user} showActions={false} />
+              <UserCard key={user._id} user={user} showActions={true} />
             ))
-          }
+          )}
         </div>
+
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="mt-10 flex justify-center items-center gap-4">
-            <button disabled={page <= 1}
+            <button
+              disabled={page <= 1}
               onClick={() => fetchProfiles(page - 1)}
-              className={`px-4 py-2 rounded-lg bg-gray-100 font-medium text-sm ${page <= 1 ? "opacity-40" : "hover:bg-indigo-100 hover:text-indigo-700"} transition`}>Prev</button>
-            <span className="text-indigo-700 font-bold text-lg">Page {page} of {totalPages}</span>
-            <button disabled={page >= totalPages}
+              className={`px-4 py-2 rounded-lg font-medium text-sm border border-gray-300 bg-white ${
+                page <= 1
+                  ? "opacity-40 cursor-not-allowed"
+                  : "hover:bg-gray-100 hover:text-[#0099CC] transition"
+              }`}
+            >
+              Prev
+            </button>
+            <span className="text-[#0099CC] font-bold text-lg">
+              Page {page} of {totalPages}
+            </span>
+            <button
+              disabled={page >= totalPages}
               onClick={() => fetchProfiles(page + 1)}
-              className={`px-4 py-2 rounded-lg bg-gray-100 font-medium text-sm ${page >= totalPages ? "opacity-40" : "hover:bg-indigo-100 hover:text-indigo-700"} transition`}>Next</button>
+              className={`px-4 py-2 rounded-lg font-medium text-sm border border-gray-300 bg-white ${
+                page >= totalPages
+                  ? "opacity-40 cursor-not-allowed"
+                  : "hover:bg-gray-100 hover:text-[#0099CC] transition"
+              }`}
+            >
+              Next
+            </button>
           </div>
         )}
       </div>

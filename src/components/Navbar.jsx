@@ -13,9 +13,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     try {
-      await axios.post(`${BASE_URL}/logout`,{}, {
+      await axios.post(`${BASE_URL}/logout`, {}, {
         withCredentials: true
       });
       dispatch(removeUser());
@@ -24,9 +24,9 @@ const Navbar = () => {
       console.log(error)
     }
   }
-  
-  return (  
-   <nav className="bg-[#0099CC] border-b border-[#c8e6ed] shadow-xl">
+
+  return (
+    <nav className="bg-[#0099CC] border-b border-[#c8e6ed] shadow-xl">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
         {/* Brand */}
         <Link
@@ -90,6 +90,14 @@ const Navbar = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link
+                    to="/search"
+                    className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+                  >
+                    Search Profiles
+                  </Link>
+                </li>
+                <li>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left hover:bg-red-100 hover:text-red-500 transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
@@ -133,6 +141,13 @@ const Navbar = () => {
               onClick={() => setMenuOpen(false)}
             >
               Requests
+            </Link>
+            <Link
+              to="/search"
+              className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+              onClick={() => setMenuOpen(false)}
+            >
+              Search Profiles
             </Link>
             <button
               onClick={handleLogout}
