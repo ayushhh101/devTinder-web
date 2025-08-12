@@ -14,6 +14,7 @@ const EditProfile = ({ user }) => {
   const [gender, setgender] = useState(user.gender || '')
   const [about, setabout] = useState(user.about || '')
   const [skills, setskills] = useState(user.skills || [])
+  const [bannerUrl, setbannerUrl] = useState(user.bannerUrl || '');
   const [headline, setheadline] = useState(user.headline || '')
   const [currentPosition, setcurrentPosition] = useState(user.currentPosition || '')
   const [location, setlocation] = useState(user.location || '')
@@ -106,6 +107,7 @@ const EditProfile = ({ user }) => {
                   { label: 'Headline', value: headline, setValue: setheadline },
                   { label: 'Current Position', value: currentPosition, setValue: setcurrentPosition },
                   { label: 'Location', value: location, setValue: setlocation },
+                  { label: 'Banner Image URL', value: bannerUrl, setValue: setbannerUrl },
                   { label: 'GitHub URL', value: githubUrl, setValue: setgithubUrl },
                   { label: 'LinkedIn URL', value: linkedinUrl, setValue: setlinkedinUrl },
                 ].map(({ label, value, setValue, textarea, type, options }, index) => (
@@ -254,6 +256,7 @@ const EditProfile = ({ user }) => {
                 gender,
                 about,
                 skills,
+                bannerUrl,
                 headline,
                 currentPosition,
                 location,

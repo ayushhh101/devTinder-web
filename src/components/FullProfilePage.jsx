@@ -43,10 +43,11 @@ const FullProfilePage = () => {
   const {
     firstName, lastName, photoUrl, age, gender, headline,
     currentPosition, location, about, skills = [],
-    githubUrl, linkedinUrl, projects = [], experience = []
+    githubUrl, linkedinUrl, bannerUrl, projects = [], experience = []
   } = profile;
 
-  const bannerImg = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80";
+  const bannerImg = bannerUrl || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80";
+
 
   const completionCriteria = [
     Boolean(photoUrl && photoUrl.trim() !== ""),
@@ -56,7 +57,7 @@ const FullProfilePage = () => {
     Boolean(location && location.trim() !== ""),
     Boolean(skills && skills.length > 0),
     Boolean(projects && projects.length > 0),
-    Boolean(githubUrl && githubUrl.trim().length > 10),  
+    Boolean(githubUrl && githubUrl.trim().length > 10),
     Boolean(linkedinUrl && linkedinUrl.trim().length > 10),
   ];
 
@@ -120,22 +121,22 @@ const FullProfilePage = () => {
         </div>
         {/* Profile Completion Progress Bar */}
         {currentUserId === userId && (
-        <div className="mx-auto w-[90%] mb-3">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-semibold text-[#1790a7] tracking-wide uppercase">
-              Profile Completion
-            </span>
-            <span className="text-xs font-medium text-[#fc787a]">
-              {completionPercent}%
-            </span>
+          <div className="mx-auto w-[90%] mb-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-semibold text-[#1790a7] tracking-wide uppercase">
+                Profile Completion
+              </span>
+              <span className="text-xs font-medium text-[#fc787a]">
+                {completionPercent}%
+              </span>
+            </div>
+            <div className="w-full h-3 bg-[#e4e7ee] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#0099CC] rounded-full transition-all duration-500"
+                style={{ width: `${completionPercent}%` }}
+              />
+            </div>
           </div>
-          <div className="w-full h-3 bg-[#e4e7ee] rounded-full overflow-hidden">
-            <div
-              className="h-full bg-[#0099CC] rounded-full transition-all duration-500"
-              style={{ width: `${completionPercent}%` }}
-            />
-          </div>
-        </div>
         )}
 
         {/* Tabs */}
