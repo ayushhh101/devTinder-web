@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { BASE_URL } from '../utils/constants'
@@ -11,7 +11,11 @@ const Navbar = () => {
   const user = useSelector(store => store.user)
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const [menuOpen, setMenuOpen] = useState(false);
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
   const unreadCount = useSelector(
     state => state.notifications.filter(n => !n.read).length
   );
@@ -28,18 +32,30 @@ const Navbar = () => {
     }
   }
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setAvatarMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <nav className="bg-[#0099CC] border-b border-[#c8e6ed] shadow-xl">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
-        {/* Brand */}
+        {/* logo */}
         <Link
           to="/feed"
-          className="text-2xl font-bold text-white tracking-tight hover:text-orange-300 transition duration-200"
+          className="text-2xl font-bold text-white tracking-tight hover:text-secondary transition duration-200"
         >
           DevTinder
         </Link>
 
-        {/* Hamburger menu for mobile */}
+        {/* hamburger menu*/}
         <button
           className="md:hidden focus:outline-none"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -51,15 +67,18 @@ const Navbar = () => {
           }
         </button>
 
-        {/* Desktop Links */}
+        {/* desktop links */}
         {user && (
           <div className="hidden md:flex items-center gap-6">
             <span className="text-sm font-medium text-[#eefcf9] whitespace-nowrap">
               Welcome, <span className="text-white font-semibold">{user.firstName}</span>
             </span>
-            <div className="relative group">
-              <button className="btn btn-ghost btn-circle avatar p-0 hover:bg-white/10 transition">
-                <div className="w-10 h-10 rounded-full border-2 border-[#c8e6ed] hover:border-orange-400 transition">
+
+            {/* avatar Menu */}
+            <div className="relative" ref={dropdownRef}>
+              <button className="btn btn-ghost btn-circle avatar p-0 hover:bg-white/10 transition"
+              onClick={() => setAvatarMenuOpen(!avatarMenuOpen)}>
+                <div className="w-10 h-10 rounded-full border-2 border-[#c8e6ed] hover:border-secondary transition">
                   <img
                     alt="User Avatar"
                     src={user.photoUrl}
@@ -67,7 +86,9 @@ const Navbar = () => {
                   />
                 </div>
               </button>
-              <ul className="absolute right-0 mt-0 w-48 bg-white border border-[#c8e6ed] rounded-xl shadow-2xl p-2.5 z-50 group-hover:opacity-100 group-hover:pointer-events-auto space-y-2">
+
+              {avatarMenuOpen && (
+              <ul className="absolute right-0 mt-0 w-48 bg-white border border-[#c8e6ed] rounded-xl shadow-2xl p-2.5 z-50 space-y-2">
                 <li>
                   <Link
                     to="/profile"
@@ -120,6 +141,7 @@ const Navbar = () => {
                   </button>
                 </li>
               </ul>
+              )}
             </div>
           </div>
         )}
