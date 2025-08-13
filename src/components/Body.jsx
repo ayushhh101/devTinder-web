@@ -33,7 +33,6 @@ const Body = () => {
   return (
     <>
       <Navbar />
-      {/* Any children routes of body will be rendered here (in outlet) below navbar*/}
       <Outlet />
       {/* <Footer /> */}
     </>
