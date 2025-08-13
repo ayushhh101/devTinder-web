@@ -5,56 +5,36 @@ import { useSelector } from 'react-redux'
 import axios from 'axios'
 import { BASE_URL } from '../utils/constants'
 
-// Debounce typing events
-const debounce = (func, delay) => {
-  let timeout;
-  return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), delay);
-  };
-};
-
 const Chat = () => {
   const { targetUserId } = useParams()
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const user = useSelector(store => store.user)
   const userId = user?._id;
-  //for typing
+
   const socketRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const isTyping = useRef(false);
+  const messagesEndRef = useRef(null);
+
   const [isTargetTyping, setIsTargetTyping] = useState(false);
   const [typingUser, setTypingUser] = useState('');
-
   const [onlineStatus, setOnlineStatus] = useState(false);
   const [lastSeen, setLastSeen] = useState(null);
-
   const [targetUser, setTargetUser] = useState(null);
-
-  const getSecretRoomId = async (userId, targetUserId) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode([userId, targetUserId].sort().join("_"));
-
-    // Hash the encoded data using SHA-256
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-
-    // Convert the hash buffer to a hexadecimal string
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-
-    return hashHex;
-  };
 
   const [inCall, setInCall] = useState(false)
   const [callStartedByMe, setCallStartedByMe] = useState(false)
+   const callStartedByMeRef = useRef(false); // Add this ref
   const [callRinging, setCallRinging] = useState(false)
   const [remoteUserName, setRemoteUserName] = useState('')
+  const [callerId, setCallerId] = useState(null);
+
   const localVideoRef = useRef(null)
   const remoteVideoRef = useRef(null)
   const localStreamRef = useRef(null)
   const peerConnectionRef = useRef(null)
-  // STUN public Google
+
   const ICE_SERVERS = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
 
   useEffect(() => {
@@ -92,29 +72,44 @@ const Chat = () => {
     }
   }
 
-  useEffect(() => {
-    fetchChatMessages()
-  }, [])
+  useEffect(() => { fetchChatMessages() }, [])
 
-  //connecting to the server as soon as the page loads
+  const handleCallAccepted = async () => {
+  console.log("[CALL ACCEPTED] callStartedByMe=", callStartedByMe);
+  setInCall(true);
+  setCallRinging(false);
+
+  if (callStartedByMeRef.current) {
+    try {
+       console.log("🟢 INITIATING WebRTC as caller");
+      await initiateWebRTC(true);
+    } catch (error) {
+      console.error("Error starting WebRTC:", error);
+      hangUp();
+    }
+  }
+};
+
+  //socket + signaling
   useEffect(() => {
     if (!userId) return;
 
     const socket = createSocketConnection()
     socketRef.current = socket
+
     socket.emit('joinChat', { firstName: user.firstName, userId, targetUserId })
+    socket.emit('setOnline', userId);
+    socket.emit('getUserStatus', targetUserId);
 
     socket.on('messageReceived', ({ firstName, lastName, text }) => {
       console.log(firstName + " " + text)
       setMessages((messages) => [...messages, { firstName, lastName, text }])
     })
 
-    //for typing 
     socket.on('typing', ({ firstName }) => {
       console.log('Received typing event from', firstName);
       setTypingUser(firstName);
       setIsTargetTyping(true);
-      // Auto-reset typing after 3 seconds
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
         setIsTargetTyping(false);
@@ -138,23 +133,221 @@ const Chat = () => {
       }
     });
 
-    socket.emit('setOnline', userId);
-    socket.emit('getUserStatus', targetUserId);
+    socket.on("incomingCall", ({ from }) => {
+      console.log("[INCOMING CALL]", from);
+      setCallerId(from.userId);
+      setRemoteUserName(from.firstName);
+      setCallRinging(true);
+      setCallStartedByMe(false);
+      callStartedByMeRef.current = false; 
+    });
+
+    // Other user accepted
+    socket.on("callAccepted", handleCallAccepted);
+
+    // Other user rejected
+    socket.on("callRejected", ({ busy }) => {
+      console.log("[CALL REJECTED]", busy ? "User busy" : "");
+      setCallRinging(false);
+      setCallStartedByMe(false);
+      alert("Call was rejected");
+    });
+
+    // Missed call handler
+    socket.on("missedCall", () => {
+      setCallRinging(false);
+      setCallStartedByMe(false);
+      alert("Missed Call");
+    });
+
+    // Remote user ended call
+    socket.on("callEnded", () => {
+      cleanupCall();
+      alert("Call ended by remote user");
+    });
+
+    socket.on("video-offer", async ({ offer, from }) => {
+      try {
+        setRemoteUserName(from.firstName)
+        if (!peerConnectionRef.current) createPeerConnection()
+        await peerConnectionRef.current.setRemoteDescription(offer)
+
+        // Get local stream and add tracks
+        const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        localStreamRef.current = localStream
+        localVideoRef.current.srcObject = localStream
+        localStream.getTracks().forEach(track =>
+          peerConnectionRef.current.addTrack(track, localStream)
+        )
+        // Create and send answer
+        const answer = await peerConnectionRef.current.createAnswer()
+        await peerConnectionRef.current.setLocalDescription(answer)
+
+        socketRef.current?.emit('video-answer', {
+          targetUserId: from.userId,
+          answer: peerConnectionRef.current.localDescription,
+          from: { firstName: user.firstName, userId }
+        })
+
+        setInCall(true)
+        setCallRinging(false)
+      } catch (err) {
+        console.error('Error handling video-offer:', err)
+        // Optional: tell caller we failed to get media, reject call gracefully
+        rejectCall()
+      }
+    })
+
+    socket.on("video-answer", async ({ answer }) => {
+      try {
+        if (peerConnectionRef.current) {
+          await peerConnectionRef.current.setRemoteDescription(answer)
+          setInCall(true)
+          setCallRinging(false)
+        }
+      } catch (err) {
+        console.error('Error handling video-answer:', err)
+      }
+    })
+
+    socket.on("ice-candidate", ({ candidate }) => {
+      if (peerConnectionRef.current && candidate) {
+        peerConnectionRef.current.addIceCandidate(candidate).catch(console.error)
+      }
+    })
 
     return () => {
+      socket.off('messageReceived')
+      socket.off('typing')
+      socket.off('stopTyping')
+      socket.off('userStatusResponse')
+      socket.off('userStatusChanged')
+      socket.off('incomingCall')
+      socket.off('callAccepted')
+      socket.off('callRejected')
+      socket.off('missedCall')
+      socket.off('callEnded')
+      socket.off('video-offer')
+      socket.off('video-answer')
+      socket.off('ice-candidate')
+
+      clearTimeout(typingTimeoutRef.current)
+      cleanupCall()
       socket.disconnect()
-      clearTimeout(typingTimeoutRef.current);
     }
   }, [userId, targetUserId])
 
-  // Add this useEffect for status tracking
+  //webrtc logics
+  const createPeerConnection = () => {
+    const pc = new window.RTCPeerConnection(ICE_SERVERS);
+
+    pc.onicecandidate = e => {
+      if (e.candidate) {
+        socketRef.current.emit("ice-candidate", {
+          targetUserId,
+          candidate: e.candidate,
+          from: { userId, firstName: user.firstName }
+        })
+      }
+    }
+    pc.ontrack = e => {
+      if (remoteVideoRef.current) remoteVideoRef.current.srcObject = e.streams[0]
+    }
+    peerConnectionRef.current = pc
+    return pc
+  }
+
+  const initiateWebRTC = async (isCaller) => {
+    try {
+      if (!peerConnectionRef.current) createPeerConnection()
+
+      const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      localStreamRef.current = localStream
+      console.log("Local stream obtained:", localStream);
+      console.log("Local video ref:", localVideoRef.current)
+
+      if (localVideoRef.current) localVideoRef.current.srcObject = localStream
+      localStream.getTracks().forEach(track => peerConnectionRef.current.addTrack(track, localStream))
+
+      if (isCaller) {
+        const offer = await peerConnectionRef.current.createOffer()
+        await peerConnectionRef.current.setLocalDescription(offer)
+        socketRef.current?.emit("video-offer", {
+          targetUserId,
+          offer: peerConnectionRef.current.localDescription,
+          from: { firstName: user.firstName, userId }
+        })
+      }
+    } catch (err) {
+      console.error('Error starting WebRTC:', err)
+      // If media fails, tell remote and reset UI
+      rejectCall()
+    }
+  }
+
+  const startCall = async () => {
+    console.log("🟢 STARTING CALL - Setting refs and state");
+    setCallStartedByMe(true);
+    callStartedByMeRef.current = true;
+    setCallRinging(true);
+
+    socketRef.current.emit("callInitiated", {
+      targetUserId,
+      from: { firstName: user.firstName, userId }
+    })
+  }
+
+  const acceptCall = async () => {
+    console.log("[ACCEPT CALL] sending to targetUserId:", targetUserId, "myId:", userId);
+    socketRef.current.emit("callAccepted", {
+      targetUserId: callerId || targetUserId,
+      from: { firstName: user.firstName, userId }
+    });
+
+    setInCall(true);
+    setCallRinging(false);
+  };
+
+  const rejectCall = () => {
+    socketRef.current.emit("callRejected", {
+      targetUserId,
+      from: { firstName: user.firstName, userId }
+    });
+    setCallRinging(false);
+    setCallStartedByMe(false);
+    callStartedByMeRef.current = false; 
+  };
+
+  const hangUp = () => {
+    cleanupCall()
+    socketRef.current.emit("callEnded", {
+      targetUserId,
+      from: { userId, firstName: user.firstName }
+    })
+  }
+
+  const cleanupCall = () => {
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(t => t.stop())
+      localStreamRef.current = null
+    }
+    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null
+    if (localVideoRef.current) localVideoRef.current.srcObject = null
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close()
+      peerConnectionRef.current = null
+    }
+    setInCall(false)
+    setCallRinging(false)
+    setCallStartedByMe(false)
+    callStartedByMeRef.current = false; 
+  }
+
+  // presence helper
   useEffect(() => {
     if (!socketRef.current || !userId) return;
 
-    // Set current user as online
     socketRef.current.emit('setOnline', userId);
-
-    // Listen for status changes
     socketRef.current.on('userStatusChanged', ({ userId: changedUserId, status, lastSeen }) => {
       if (changedUserId === targetUserId) {
         setOnlineStatus(status === 'online');
@@ -229,117 +422,15 @@ const Chat = () => {
     return `${Math.floor(diffInMinutes / 1440)} days ago`;
   };
 
-  const appBlue = "#16a3bb";
-  const appPink = "#fc787a";
-  const appBg = "#f6fbff";
-
-  // Scroll to bottom on new message
-  const messagesEndRef = useRef(null);
+  // message end ref
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isTargetTyping]);
 
-  useEffect(() => {
-    if (!socketRef.current) return
-    // Listen for signaling events
-    
-    socketRef.current.on("video-offer", async ({ offer, from }) => {
-      setRemoteUserName(from.firstName)
-      if (!peerConnectionRef.current) createPeerConnection()
-      await peerConnectionRef.current.setRemoteDescription(offer)
-      // Get local stream and add tracks
-      const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      localStreamRef.current = localStream
-      localVideoRef.current.srcObject = localStream
-      localStream.getTracks().forEach(track =>
-        peerConnectionRef.current.addTrack(track, localStream)
-      )
-      // Create and send answer
-      const answer = await peerConnectionRef.current.createAnswer()
-      await peerConnectionRef.current.setLocalDescription(answer)
-      socketRef.current.emit('video-answer', {
-        targetUserId,
-        answer: peerConnectionRef.current.localDescription,
-        from: { firstName: user.firstName, userId }
-      })
-      setInCall(true)
-      setCallRinging(false)
-    })
 
-    socketRef.current.on("video-answer", async ({ answer }) => {
-      // Receiving answer — caller
-      if (peerConnectionRef.current) {
-        await peerConnectionRef.current.setRemoteDescription(answer)
-        setInCall(true)
-        setCallRinging(false)
-      }
-    })
 
-    socketRef.current.on("ice-candidate", ({ candidate }) => {
-      if (peerConnectionRef.current && candidate) {
-        peerConnectionRef.current.addIceCandidate(candidate)
-      }
-    })
-
-    // Optional: handle call hang-up events
-
-    return () => {
-      // Remove listeners if needed
-      socketRef.current.off("video-offer")
-      socketRef.current.off("video-answer")
-      socketRef.current.off("ice-candidate")
-    }
-  }, [targetUserId, userId])
-
-  //webrtc logics
-  const createPeerConnection = () => {
-    const pc = new window.RTCPeerConnection(ICE_SERVERS)
-    pc.onicecandidate = e => {
-      if (e.candidate) {
-        socketRef.current.emit("ice-candidate", {
-          targetUserId, candidate: e.candidate, from: { userId, firstName: user.firstName }
-        })
-      }
-    }
-    pc.ontrack = e => {
-      // Attach remote stream
-      if (remoteVideoRef.current) remoteVideoRef.current.srcObject = e.streams[0]
-    }
-    peerConnectionRef.current = pc
-    return pc
-  }
-
-  const startCall = async () => {
-    setCallStartedByMe(true); setCallRinging(true)
-    if (!peerConnectionRef.current) createPeerConnection()
-    // Get local video/audio
-    const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    localStreamRef.current = localStream
-    localVideoRef.current.srcObject = localStream
-    localStream.getTracks().forEach(track => {
-      peerConnectionRef.current.addTrack(track, localStream)
-    })
-    // Make offer
-    const offer = await peerConnectionRef.current.createOffer()
-    await peerConnectionRef.current.setLocalDescription(offer)
-    socketRef.current.emit("video-offer", {
-      targetUserId,
-      offer: peerConnectionRef.current.localDescription,
-      from: { firstName: user.firstName, userId }
-    })
-  }
-
-  const hangUp = () => {
-    // Stop video, close connection
-    if (localStreamRef.current) localStreamRef.current.getTracks().forEach(t => t.stop())
-    if (peerConnectionRef.current) peerConnectionRef.current.close()
-    peerConnectionRef.current = null
-    setInCall(false); setCallRinging(false); setCallStartedByMe(false)
-    // Optional: emit hangup event to other side and handle 
-  }
-  
   return (
     <div className="min-h-screen flex items-center justify-center p-3" style={{ background: "#f6fbff" }}>
       <div className="w-full max-w-5xl bg-white rounded-3xl border border-[#e4e7ee] shadow-xl flex flex-col h-[85vh] overflow-hidden">
@@ -348,8 +439,23 @@ const Chat = () => {
           <span className="text-2xl font-bold tracking-tight text-[#16a3bb]">
             {targetUser ? `Chat with ${targetUser.firstName}` : 'Chat'}
           </span>
+
+          {/* Incoming Call UI */}
+          {callRinging && !callStartedByMe && (
+            <div className="incoming-call-modal">
+              <p>{remoteUserName} is calling you...</p>
+              <button onClick={acceptCall} className="bg-green-500 text-white px-4 py-2 rounded">Accept</button>
+              <button onClick={rejectCall} className="bg-red-500 text-white px-4 py-2 rounded">Reject</button>
+            </div>
+          )}
+
+          {/* Outgoing Ringing UI */}
+          {callRinging && callStartedByMe && !inCall && (
+            <div className="outgoing-call-indicator text-sm text-gray-500">Ringing...</div>
+          )}
+
           <div className='flex flex-row justify-center items-center'>
-             <button
+            <button
               onClick={startCall}
               className="bg-[#16a3bb] text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-[#1294a6] transition"
               disabled={inCall || callRinging}
@@ -370,22 +476,15 @@ const Chat = () => {
           </div>
         </div>
 
-         {/* VIDEO CALL UI */}
-        {(inCall || callRinging) && (
-          <div className="p-4 border-b border-[#e4e7ee] flex flex-col items-center">
-            <div className="text-lg font-semibold mb-2">
-              {callRinging && callStartedByMe && "Calling..."}
-              {callRinging && !callStartedByMe && "Incoming call..."}
-              {inCall && "In Video Call"}
+        {/* VIDEO CALL UI */}
+        {(inCall) && (
+          <div className="p-4 border-b flex flex-col items-center">
+            <div className="text-lg font-semibold mb-2">{inCall && "In Video Call"}</div>
+            <div className="flex gap-3">
+              <video ref={localVideoRef} autoPlay muted className="w-56 h-40 bg-gray-200 rounded-xl border-2" />
+              <video ref={remoteVideoRef} autoPlay className="w-56 h-40 bg-green-50 rounded-xl border-2" />
             </div>
-            <div className="flex gap-3 justify-center items-center">
-              <video ref={localVideoRef} autoPlay muted className="w-56 h-40 bg-[#e6e6e6] rounded-xl border-2" />
-              <video ref={remoteVideoRef} autoPlay className="w-56 h-40 bg-[#e0ffe6] rounded-xl border-2" />
-            </div>
-            <button
-              className="mt-3 bg-[#fc787a] text-white px-5 py-2 rounded-lg shadow hover:bg-[#fa5151] font-semibold"
-              onClick={hangUp}
-            >End Call</button>
+            <button onClick={hangUp} className="mt-3 bg-red-500 text-white px-5 py-2 rounded-lg">End Call</button>
           </div>
         )}
 

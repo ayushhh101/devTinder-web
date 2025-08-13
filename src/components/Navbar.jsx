@@ -9,6 +9,8 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 const Navbar = () => {
   const user = useSelector(store => store.user)
+  const userData = useSelector(store => store.user._id);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -68,7 +70,7 @@ const Navbar = () => {
         </button>
 
         {/* desktop links */}
-        {user && (
+        {userData && (
           <div className="hidden md:flex items-center gap-6">
             <span className="text-sm font-medium text-[#eefcf9] whitespace-nowrap">
               Welcome, <span className="text-white font-semibold">{user.firstName}</span>
@@ -147,8 +149,8 @@ const Navbar = () => {
         )}
       </div>
 
-      {/* Mobile menu (only appears when menuOpen) */}
-      {user && menuOpen && (
+      {/* mobile menu */}
+      {userData && menuOpen && (
         <div className="md:hidden px-4 pb-4">
           <div className="bg-white rounded-xl border border-[#c8e6ed] shadow-xl p-4 flex flex-col gap-2">
             <span className="text-sm font-medium text-[#11778a] mb-2">
