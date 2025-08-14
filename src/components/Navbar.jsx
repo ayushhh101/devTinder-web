@@ -28,7 +28,7 @@ const Navbar = () => {
       dispatch(removeUser());
       return navigate('/login');
     } catch (error) {
-      res.send({message: "Some error occured" , error})
+      res.send({ message: "Some error occured", error })
     }
   }
 
@@ -52,8 +52,13 @@ const Navbar = () => {
         {/* logo */}
         <Link
           to="/feed"
-          className="text-2xl font-bold text-white tracking-tight hover:text-secondary transition duration-200"
+          className="flex items-center gap-3 text-2xl font-bold text-white tracking-tight hover:text-secondary transition duration-200"
         >
+          <img
+            src="linkspark logo main.png"
+            alt="nav-logo"
+            className="h-10 w-auto object-contain rounded-2xl"
+          />
           LinkSpark
         </Link>
 
@@ -79,7 +84,7 @@ const Navbar = () => {
             {/* avatar Menu */}
             <div className="relative" ref={dropdownRef}>
               <button className="btn btn-ghost btn-circle avatar p-0 hover:bg-white/10 transition"
-              onClick={() => setAvatarMenuOpen(!avatarMenuOpen)}>
+                onClick={() => setAvatarMenuOpen(!avatarMenuOpen)}>
                 <div className="w-10 h-10 rounded-full border-2 border-[#c8e6ed] hover:border-secondary transition">
                   <img
                     alt="User Avatar"
@@ -90,59 +95,59 @@ const Navbar = () => {
               </button>
 
               {avatarMenuOpen && (
-              <ul className="absolute right-0 mt-0 w-48 bg-white border border-[#c8e6ed] rounded-xl shadow-2xl p-2.5 z-50 space-y-2">
-                <li>
-                  <Link
-                    to="/profile"
-                    className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
-                  >
-                    Profile
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/connections"
-                    className="hover:bg-[#f3f7fa] hover:text-[#21d8d8] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
-                  >
-                    Connections
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/requests"
-                    className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
-                  >
-                    Requests
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/search"
-                    className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
-                  >
-                    Search Profiles
-                  </Link>
-                </li>
-                <li className="relative">
-                  <Link to="/notifications" className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-xl px-3 py-2.5 text-sm font-medium text-[#147687]">
-                    Notifications
-                    {unreadCount > 0 && (
-                      <span className="absolute ml-2 bg-red-500 text-white text-xs px-1 rounded-full">
-                        {unreadCount}
-                      </span>
-                    )}
-                  </Link>
-                </li>
+                <ul className="absolute right-0 mt-0 w-48 bg-white border border-[#c8e6ed] rounded-xl shadow-2xl p-2.5 z-50 space-y-2">
+                  <li>
+                    <Link
+                      to="/profile"
+                      className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+                    >
+                      Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/connections"
+                      className="hover:bg-[#f3f7fa] hover:text-[#21d8d8] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+                    >
+                      Connections
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/requests"
+                      className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+                    >
+                      Requests
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/search"
+                      className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+                    >
+                      Search Profiles
+                    </Link>
+                  </li>
+                  <li className="relative">
+                    <Link to="/notifications" className="hover:bg-[#e5faff] hover:text-[#17b3c9] transition rounded-xl px-3 py-2.5 text-sm font-medium text-[#147687]">
+                      Notifications
+                      {unreadCount > 0 && (
+                        <span className="absolute ml-2 bg-red-500 text-white text-xs px-1 rounded-full">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
 
-                <li>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left hover:bg-red-100 hover:text-red-500 transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
-                  >
-                    Logout
-                  </button>
-                </li>
-              </ul>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left hover:bg-red-100 hover:text-red-500 transition rounded-lg px-3 py-2.5 text-sm font-medium text-[#147687]"
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </ul>
               )}
             </div>
           </div>
