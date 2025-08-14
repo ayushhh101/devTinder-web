@@ -8,9 +8,7 @@ import '../components-css/Navbar.css'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 const Navbar = () => {
-  const user = useSelector(store => store.user)
-  const userData = useSelector(store => store.user._id);
-
+  const userObj = useSelector(store => store.user?.user ?? store.user ?? null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -46,6 +44,8 @@ const Navbar = () => {
     };
   }, []);
 
+  const isLoggedIn = Boolean(userObj && userObj._id);
+
   return (
     <nav className="bg-[#0099CC] border-b border-[#c8e6ed] shadow-xl">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
@@ -70,10 +70,10 @@ const Navbar = () => {
         </button>
 
         {/* desktop links */}
-        {userData && (
+        {isLoggedIn && (
           <div className="hidden md:flex items-center gap-6">
             <span className="text-sm font-medium text-[#eefcf9] whitespace-nowrap">
-              Welcome, <span className="text-white font-semibold">{user.firstName}</span>
+              Welcome, <span className="text-white font-semibold">{userObj?.firstName}</span>
             </span>
 
             {/* avatar Menu */}
@@ -83,7 +83,7 @@ const Navbar = () => {
                 <div className="w-10 h-10 rounded-full border-2 border-[#c8e6ed] hover:border-secondary transition">
                   <img
                     alt="User Avatar"
-                    src={user.photoUrl}
+                    src={userObj?.photoUrl}
                     className="object-cover w-full h-full rounded-full"
                   />
                 </div>
@@ -150,11 +150,11 @@ const Navbar = () => {
       </div>
 
       {/* mobile menu */}
-      {userData && menuOpen && (
+      {isLoggedIn && menuOpen && (
         <div className="md:hidden px-4 pb-4">
           <div className="bg-white rounded-xl border border-[#c8e6ed] shadow-xl p-4 flex flex-col gap-2">
             <span className="text-sm font-medium text-[#11778a] mb-2">
-              Welcome, <span className="text-[#17b3c9] font-semibold">{user.firstName}</span>
+              Welcome, <span className="text-[#17b3c9] font-semibold">{userObj?.firstName}</span>
             </span>
             <Link
               to="/profile"

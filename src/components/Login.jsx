@@ -5,6 +5,19 @@ import { useDispatch } from 'react-redux'
 import { addUser } from '../utils/userSlice'
 import { useNavigate } from 'react-router-dom'
 import { BASE_URL } from '../utils/constants'
+
+function getErrorMessage(error) {
+  if (error.response) {
+    // Received error response from backend
+    return error.response.data?.message || 'An error occurred. Please try again.'
+  } else if (error.request) {
+    // Request was made, but no response (network/server error)
+    return 'Network error. Please check your connection.'
+  } else {
+    return 'Unexpected error. Please try again.'
+  }
+}
+
 const Login = () => {
 
   const [emailId, setemailId] = useState('')
@@ -12,12 +25,32 @@ const Login = () => {
   const [firstName, setfirstName] = useState('')
   const [lastName, setlastName] = useState('')
   const [isLoginForm, setisLoginForm] = useState(false)
-  const [error, seterror] = useState('')
+  const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState({})
+  const [loading, setLoading] = useState(false)
 
   const dispatch = useDispatch();
   const navigate = useNavigate()
 
+  const validateFields = () => {
+    const errs = {}
+    if (!emailId) errs.emailId = 'Email is required'
+    else if (!/^[\w.-]+@[\w.-]+\.\w{2,}$/.test(emailId)) errs.emailId = 'Enter a valid email'
+    if (!password) errs.password = 'Password is required'
+    else if (password.length < 6) errs.password = 'Password at least 6 chars'
+    if (!isLoginForm) {
+      if (!firstName) errs.firstName = 'First name required'
+      if (!lastName) errs.lastName = 'Last name required'
+    }
+    return errs
+  }
+
   const handleLogin = async () => {
+    setError('')
+    setFieldErrors({})
+    const errs = validateFields()
+    if (Object.keys(errs).length) { setFieldErrors(errs); return }
+    setLoading(true)
     try {
       const res = await axios.post(`${BASE_URL}/login`, {
         emailId,
@@ -27,11 +60,18 @@ const Login = () => {
       dispatch(addUser(res.data.data))
       navigate('/feed')
     } catch (error) {
-      seterror(error?.response?.data?.message || 'Something went wrong')
+      setError(getErrorMessage(error))
+    } finally {
+      setLoading(false)
     }
   }
 
   const handleSignUp = async () => {
+    setError('')
+    setFieldErrors({})
+    const errs = validateFields()
+    if (Object.keys(errs).length) { setFieldErrors(errs); return }
+    setLoading(true)
     try {
       const res = await axios.post(`${BASE_URL}/signup`, {
         firstName,
@@ -42,7 +82,9 @@ const Login = () => {
       dispatch(addUser(res.data.data))
       navigate('/profile')
     } catch (error) {
-      seterror(error?.response?.data?.message || 'Something went wrong' + error)
+      setError(getErrorMessage(error))
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -82,6 +124,7 @@ const Login = () => {
                       placeholder="First Name"
                       onChange={e => setfirstName(e.target.value)}
                     />
+                    {fieldErrors.firstName && <p className="text-red-600">{fieldErrors.firstName}</p>}
                   </div>
                   <div>
                     <input
@@ -91,6 +134,7 @@ const Login = () => {
                       placeholder="Last Name"
                       onChange={e => setlastName(e.target.value)}
                     />
+                    {fieldErrors.lastName && <p className="text-sm text-red-600 mt-1">{fieldErrors.lastName}</p>}
                   </div>
                 </>
               )}
@@ -102,6 +146,8 @@ const Login = () => {
                   placeholder="Email Address"
                   onChange={e => setemailId(e.target.value)}
                 />
+                {fieldErrors.emailId && (
+                  <p className="text-sm text-red-600 mt-1">{fieldErrors.emailId}</p> )}
               </div>
               <div>
                 <input
@@ -111,6 +157,8 @@ const Login = () => {
                   placeholder="Password"
                   onChange={e => setpassword(e.target.value)}
                 />
+                {fieldErrors.password && (
+                  <p className="text-sm text-red-600 mt-1">{fieldErrors.password}</p>  )}
               </div>
             </div>
             {error && (
