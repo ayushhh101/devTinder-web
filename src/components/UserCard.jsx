@@ -6,10 +6,21 @@ import { removeUserFromFeed } from '../utils/feedSlice';
 import '../components-css/UserCard.css';
 import { Link } from 'react-router-dom';
 import { globalSocket } from './NotificationListener';
+import { toast } from 'react-toastify';
 
-const UserCard = ({ user , variant = 'profile'}) => {
-  
-   const isSearch = variant === 'search';
+const getErrorMessage = error => {
+  if (error.response) {
+    return error.response.data?.message || 'An error occurred. Please try again.';
+  } else if (error.request) {
+    return 'Network error. Please check your internet connection.';
+  } else {
+    return 'Unexpected error. Please try again.';
+  }
+};
+
+const UserCard = ({ user, variant = 'profile' }) => {
+
+  const isSearch = variant === 'search';
 
   console.log(user);
   const dispatch = useDispatch();
@@ -37,22 +48,24 @@ const UserCard = ({ user , variant = 'profile'}) => {
       const res = await axios.post(`${BASE_URL}/request/send/${status}/${userId}`, {}, { withCredentials: true });
       dispatch(removeUserFromFeed(userId));
 
-       if (status === 'interested' && globalSocket) {
+      if (status === 'interested' && globalSocket) {
         globalSocket.emit('sendConnectionRequestNotification', {
           fromUserId: currentUser._id,
-          toUserId: userId, 
+          toUserId: userId,
           firstName: currentUser.firstName,
           lastName: currentUser.lastName
         });
       }
       console.log(res);
     } catch (error) {
-      console.log(error);
+      const message = getErrorMessage(error);
+      console.error("Send Request Error:", message);
+      toast(message)
     }
   };
 
   return (
-     <div className="w-full h-full flex justify-center items-center mt-2 rounded-2xl shadow-2xl">
+    <div className="w-full h-full flex justify-center items-center mt-2 rounded-2xl shadow-2xl">
       <div
         className={`relative min-h-full w-full rounded-3xl shadow-2xl bg-white ring-indigo-200/20 overflow-hidden border border-indigo-100/10 
           ${isSearch ? 'max-w-sm' : 'max-w-md'}`}
@@ -149,24 +162,24 @@ const UserCard = ({ user , variant = 'profile'}) => {
 
           {/* Buttons */}
           {!isSearch && (
-             <div className={`flex justify-center ${isSearch ? 'gap-4 mt-auto pt-3' : 'gap-32 mt-4'}`}>
-            <button
-              className={`${isSearch ? 'w-12 h-12 text-base' : 'w-16 h-16 text-2xl'} rounded-full flex justify-center items-center bg-[#f0f3f7] hover:bg-[#e3eaf6] transition shadow border-2 border-[#e3eaf6]`}
-              onClick={() => handleSendRequest('ignored', targetUserId)}
-              aria-label="Ignore user"
-            >
-              <i className="ri-close-line"></i>
-            </button>
-            <button
-              className={`${isSearch ? 'w-12 h-12 text-base' : 'w-16 h-16 text-2xl'} rounded-full flex justify-center items-center bg-[#FF6B6B] text-white font-bold shadow-xl hover:scale-105 active:scale-100 transition-transform`}
-              onClick={() => handleSendRequest('interested', targetUserId)}
-              aria-label="Connect with user"
-            >
-              <i className="ri-heart-2-fill"></i>
-            </button>
-          </div>
+            <div className={`flex justify-center ${isSearch ? 'gap-4 mt-auto pt-3' : 'gap-32 mt-4'}`}>
+              <button
+                className={`${isSearch ? 'w-12 h-12 text-base' : 'w-16 h-16 text-2xl'} rounded-full flex justify-center items-center bg-[#f0f3f7] hover:bg-[#e3eaf6] transition shadow border-2 border-[#e3eaf6]`}
+                onClick={() => handleSendRequest('ignored', targetUserId)}
+                aria-label="Ignore user"
+              >
+                <i className="ri-close-line"></i>
+              </button>
+              <button
+                className={`${isSearch ? 'w-12 h-12 text-base' : 'w-16 h-16 text-2xl'} rounded-full flex justify-center items-center bg-[#FF6B6B] text-white font-bold shadow-xl hover:scale-105 active:scale-100 transition-transform`}
+                onClick={() => handleSendRequest('interested', targetUserId)}
+                aria-label="Connect with user"
+              >
+                <i className="ri-heart-2-fill"></i>
+              </button>
+            </div>
           )}
-         
+
         </div>
       </div>
     </div>

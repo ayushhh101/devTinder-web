@@ -5,6 +5,22 @@ import axios from 'axios'
 import { addUser } from '../utils/userSlice'
 import { BASE_URL } from '../utils/constants'
 
+const getErrorMessage = (error) => {
+  if (error?.response?.data?.message) {
+    return error.response.data.message;
+  }
+  if (error?.response?.data) {
+    return typeof error.response.data === 'string'
+      ? error.response.data
+      : JSON.stringify(error.response.data);
+  }
+  if (error?.request) {
+    return 'Network error. Please check your connection.';
+  }
+  return 'Unexpected error. Please try again.';
+};
+
+
 const EditProfile = ({ user }) => {
   const { _id } = user;
   const [firstName, setfirstName] = useState(user.firstName || '')
@@ -21,14 +37,36 @@ const EditProfile = ({ user }) => {
   const [githubUrl, setgithubUrl] = useState(user.githubUrl || '')
   const [linkedinUrl, setlinkedinUrl] = useState(user.linkedinUrl || '')
   const [projects, setprojects] = useState(user.projects || [])
-  
+
   const [newSkill, setnewSkill] = useState('')
   const [error, seterror] = useState('')
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const [showtoast, setshowtoast] = useState(false)
 
+  const genderOptions = ['', 'male', 'female', 'others']
+
+  const validateForm = () => {
+    if (!firstName.trim()) return 'First name is required';
+    if (!lastName.trim()) return 'Last name is required';
+    if (age && (isNaN(age) || age < 0)) return 'Age must be a valid positive number';
+    if (githubUrl && !/^https?:\/\/.+/.test(githubUrl)) return 'Invalid GitHub URL';
+    if (linkedinUrl && !/^https?:\/\/.+/.test(linkedinUrl)) return 'Invalid LinkedIn URL';
+    if (photoUrl && !/^https?:\/\/.+/.test(photoUrl)) return 'Invalid photo URL';
+    if (bannerUrl && !/^https?:\/\/.+/.test(bannerUrl)) return 'Invalid banner URL';
+    return null;
+  };
+
   const saveProfile = async () => {
     seterror('')
+    const validationError = validateForm();
+    if (validationError) {
+      seterror(validationError);
+      return;
+    }
+
+    setLoading(true);
+
     try {
       const res = await axios.patch(`${BASE_URL}/profile/edit`, {
         firstName,
@@ -51,7 +89,9 @@ const EditProfile = ({ user }) => {
         setshowtoast(false)
       }, 3000)
     } catch (error) {
-      seterror(error?.response?.data || 'Something went wrong')
+      seterror(getErrorMessage(error))
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -74,22 +114,23 @@ const EditProfile = ({ user }) => {
     updatedProjects[index] = { ...updatedProjects[index], [field]: value }
     setprojects(updatedProjects)
   }
+
   const addProject = () => {
     setprojects([...projects, { title: '', description: '', link: '' }])
   }
+
   const removeProject = (index) => {
     const updatedProjects = [...projects]
     updatedProjects.splice(index, 1)
     setprojects(updatedProjects)
   }
 
-  const genderOptions = ['', 'male', 'female', 'others']
 
   return (
     <>
       <div className="min-h-screen w-full bg-white">
         <div className="flex flex-col md:flex-row justify-center gap-16 max-w-6xl mx-auto px-11">
-          {/* Edit Profile Card - Left Side */}
+          {/* left side (edit) */}
           <div className="w-full max-w-md mx-auto mb-10 md:mb-0">
             <div className="bg-white rounded-3xl border border-[#e4e7ee] shadow-xl px-8 py-9">
               <h2 className="text-2xl font-bold text-center text-[#333333] mb-8 tracking-tight">
@@ -225,8 +266,8 @@ const EditProfile = ({ user }) => {
               </div>
 
               {error && (
-                <div className="mt-6 p-3 bg-red-500/20 border border-red-400/30 rounded-lg">
-                  <p className="text-red-200 text-sm text-center">{error}</p>
+                <div className="mt-6 p-3 bg-red-200 border border-red-400 rounded-lg">
+                  <p className="text-white text-base   font-bold text-center">{error}</p>
                 </div>
               )}
 
@@ -234,8 +275,9 @@ const EditProfile = ({ user }) => {
                 <button
                   className="w-full bg-[#1790a7] hover:bg-[#13697c] text-white font-semibold py-3 px-6 rounded-xl transition shadow"
                   onClick={saveProfile}
+                  disabled={loading}
                 >
-                  Save Profile
+                  {loading ? 'Saving...' : 'Save Profile'}
                 </button>
               </div>
             </div>
@@ -268,7 +310,6 @@ const EditProfile = ({ user }) => {
           </div>
         </div>
 
-        {/* Toast Notification */}
         {showtoast && (
           <div className="fixed top-6 right-6 z-50 animate-in slide-in-from-right duration-300">
             <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-xl shadow-2xl border border-green-400/30">

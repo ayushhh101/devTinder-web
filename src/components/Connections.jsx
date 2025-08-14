@@ -6,6 +6,16 @@ import { BASE_URL } from '../utils/constants'
 import { addConnections } from '../utils/connectionSlice'
 import { createSocketConnection } from '../utils/socket'
 
+const getErrorMessage = (error) => {
+  if (error.response) {
+    return error.response.data?.message || "An unexpected error occurred.";
+  }
+  if (error.request) {
+    return "Network error. Please check your internet connection.";
+  }
+  return "Something went wrong. Please try again.";
+};
+
 const Connections = () => {
   const connections = useSelector(state => state.connections)
   const dispatch = useDispatch()
@@ -18,7 +28,9 @@ const Connections = () => {
         const res = await axios.get(`${BASE_URL}/user/connections`, { withCredentials: true })
         dispatch(addConnections(res.data.data))
       } catch (error) {
-        console.log(error)
+        const msg = getErrorMessage(err);
+        console.error("Fetch connections error:", msg);
+        setError(msg);
       }
     }
     fetchConnections()
@@ -50,10 +62,18 @@ const Connections = () => {
     }
 
     return () => socket.disconnect()
-  }, [user,connections])
+  }, [user, connections])
 
   if (!connections) return null
   if (connections.length === 0) return <div className="min-h-screen flex items-center justify-center font-alibaba text-lg text-textPrimary">No connections</div>
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-600 font-semibold">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen flex flex-col items-center mt-6 bg-white font-alibaba px-4'>
