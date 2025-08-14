@@ -6,11 +6,21 @@ import { useSelector } from 'react-redux';
 
 const TABS = ["About", "Skills", "Projects", "Experience"];
 
+const getErrorMessage = (error) => {
+  if (error.response) {
+    return error.response.data?.message || 'An unexpected error occurred.';
+  } else if (error.request) {
+    return 'Network error. Please check your connection.';
+  }
+  return 'Something went wrong. Please try again.';
+};
+
 const FullProfilePage = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const { userId } = useParams();
   const [activeTab, setActiveTab] = useState(0);
+  const [errorMsg, setErrorMsg] = useState('');
   const currentUserId = useSelector(store => store.user?._id);
 
   useEffect(() => {
@@ -18,9 +28,10 @@ const FullProfilePage = () => {
       setLoading(true);
       try {
         const res = await axios.get(`${BASE_URL}/user/${userId}`, { withCredentials: true });
-        setProfile(res.data);
+        setProfile(res.data.data || res.data);
       } catch (err) {
         setProfile(null);
+        setErrorMsg(getErrorMessage(err));
       } finally {
         setLoading(false);
       }
@@ -31,7 +42,7 @@ const FullProfilePage = () => {
   const handleRequest = async (userId) => {
     try {
       await axios.post(`${BASE_URL}/request/send/interested/${userId}`, {}, { withCredentials: true });
-      // You can show a notification here if you'd like!
+      //TODO: show notification
     } catch (error) { }
   }
 
@@ -39,6 +50,19 @@ const FullProfilePage = () => {
     return <div className="h-screen flex items-center justify-center text-[#1790a7]">Loading profile...</div>;
   if (!profile)
     return <div className="h-screen flex items-center justify-center text-[#fc787a]">User Not Found</div>;
+  if (errorMsg) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center text-red-500">
+        <p>{errorMsg}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-[#1790a7] text-white rounded"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   const {
     firstName, lastName, photoUrl, age, gender, headline,

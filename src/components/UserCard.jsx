@@ -47,7 +47,7 @@ const UserCard = ({ user, variant = 'profile' }) => {
     try {
       const res = await axios.post(`${BASE_URL}/request/send/${status}/${userId}`, {}, { withCredentials: true });
       dispatch(removeUserFromFeed(userId));
-
+      //TODO: show notification
       if (status === 'interested' && globalSocket) {
         globalSocket.emit('sendConnectionRequestNotification', {
           fromUserId: currentUser._id,
