@@ -8,11 +8,19 @@ const NotificationCenter = () => {
   const dispatch = useDispatch();
 
   const handleMarkRead = (id) => {
-    dispatch(markNotificationRead({ id }));
+    try {
+      dispatch(markNotificationRead({ id }));
+    } catch (err) {
+      alert("Failed to mark notification as read");
+    }
   };
 
   const handleMarkAll = () => {
-    dispatch(markAllRead());
+    try {
+      dispatch(markAllRead());
+    } catch (err) {
+      alert("Failed to mark all notifications as read");
+    }
   };
 
   if (!notifications.length) {
@@ -36,9 +44,8 @@ const NotificationCenter = () => {
           <li
             key={n.id}
             onClick={() => handleMarkRead(n.id)}
-            className={`p-4 rounded-lg border cursor-pointer transition ${
-              n.read ? 'bg-gray-50 border-gray-200' : 'bg-[#e0f7fa] border-[#0099CC]'
-            }`}
+            className={`p-4 rounded-lg border cursor-pointer transition ${n.read ? 'bg-gray-50 border-gray-200' : 'bg-[#e0f7fa] border-[#0099CC]'
+              }`}
           >
             <p className="font-medium">{n.message || `${n.firstName} ${n.lastName}`}</p>
             <p className="text-sm text-gray-500">

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addRequests, removeRequest } from '../utils/requestSlice'
 import { globalSocket } from './NotificationListener';
 import { Link } from 'react-router-dom'
+import { getErrorMessage } from '../utils/errorHandler';
 
 const Requests = () => {
   const dispatch = useDispatch()
@@ -27,7 +28,9 @@ const Requests = () => {
       }
       console.log(res)
     } catch (error) {
-      console.log(error)
+      const msg = getErrorMessage(error);
+      alert(msg); // Replace with toast/snackbar for better UX
+      console.error("Review request failed:", msg);
     }
   }
 
@@ -38,7 +41,9 @@ const Requests = () => {
       dispatch(addRequests(res.data.data))
 
     } catch (error) {
-      console.log(error)
+      const msg = getErrorMessage(error);
+      alert(msg);
+      console.error("Fetching requests failed:", msg);
     }
   }
 
@@ -64,15 +69,15 @@ const Requests = () => {
               key={_id}
               className='bg-white border border-lightGray rounded-2xl shadow-sm px-4 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4'
             >
-               {/* Left: Avatar and Info */}
+              {/* Left: Avatar and Info */}
               <div className="flex flex-col sm:flex-row items-center flex-1 gap-4">
-                 <Link to={`/profile/${_id}`}>
-                <div className="w-14 h-14 rounded-full bg-lightGray overflow-hidden">
-                  <img
-                    src={photoUrl}
-                    className='object-cover w-full h-full rounded-full'
-                  />
-                </div>
+                <Link to={`/profile/${_id}`}>
+                  <div className="w-14 h-14 rounded-full bg-lightGray overflow-hidden">
+                    <img
+                      src={photoUrl}
+                      className='object-cover w-full h-full rounded-full'
+                    />
+                  </div>
                 </Link>
 
                 <div className='text-center sm:text-left'>
