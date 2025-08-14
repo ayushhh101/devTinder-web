@@ -21,6 +21,7 @@ const Connections = () => {
   const dispatch = useDispatch()
   const [onlineUserIds, setOnlineUserIds] = useState([])
   const user = useSelector(store => store.user)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const fetchConnections = async () => {
