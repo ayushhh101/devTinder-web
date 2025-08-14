@@ -54,7 +54,7 @@ const Navbar = () => {
           to="/feed"
           className="text-2xl font-bold text-white tracking-tight hover:text-secondary transition duration-200"
         >
-          DevTinder
+          LinkSpark
         </Link>
 
         {/* hamburger menu*/}

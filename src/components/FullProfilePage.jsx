@@ -78,7 +78,7 @@ const FullProfilePage = () => {
           </div>
           {/* App name left, Connect right */}
           <div className="absolute flex justify-between items-center w-full px-6 top-6 left-0">
-            <span className="text-xl font-bold lowercase text-[#1790a7] tracking-tight">devtinder</span>
+            <span className="text-xl font-bold lowercase text-[#1790a7] tracking-tight">linkspark</span>
             <button
               className="px-6 py-1.5 bg-[#fc787a] hover:bg-[#ff6767] text-white font-semibold rounded-full shadow transition"
               onClick={() => handleRequest(userId)}

@@ -25,7 +25,7 @@ const Chat = () => {
 
   const [inCall, setInCall] = useState(false)
   const [callStartedByMe, setCallStartedByMe] = useState(false)
-   const callStartedByMeRef = useRef(false); // Add this ref
+  const callStartedByMeRef = useRef(false); // Add this ref
   const [callRinging, setCallRinging] = useState(false)
   const [remoteUserName, setRemoteUserName] = useState('')
   const [callerId, setCallerId] = useState(null);
@@ -75,20 +75,20 @@ const Chat = () => {
   useEffect(() => { fetchChatMessages() }, [])
 
   const handleCallAccepted = async () => {
-  console.log("[CALL ACCEPTED] callStartedByMe=", callStartedByMe);
-  setInCall(true);
-  setCallRinging(false);
+    console.log("[CALL ACCEPTED] callStartedByMe=", callStartedByMe);
+    setInCall(true);
+    setCallRinging(false);
 
-  if (callStartedByMeRef.current) {
-    try {
-       console.log("🟢 INITIATING WebRTC as caller");
-      await initiateWebRTC(true);
-    } catch (error) {
-      console.error("Error starting WebRTC:", error);
-      hangUp();
+    if (callStartedByMeRef.current) {
+      try {
+        console.log("🟢 INITIATING WebRTC as caller");
+        await initiateWebRTC(true);
+      } catch (error) {
+        console.error("Error starting WebRTC:", error);
+        hangUp();
+      }
     }
-  }
-};
+  };
 
   //socket + signaling
   useEffect(() => {
@@ -139,7 +139,7 @@ const Chat = () => {
       setRemoteUserName(from.firstName);
       setCallRinging(true);
       setCallStartedByMe(false);
-      callStartedByMeRef.current = false; 
+      callStartedByMeRef.current = false;
     });
 
     // Other user accepted
@@ -315,7 +315,7 @@ const Chat = () => {
     });
     setCallRinging(false);
     setCallStartedByMe(false);
-    callStartedByMeRef.current = false; 
+    callStartedByMeRef.current = false;
   };
 
   const hangUp = () => {
@@ -340,7 +340,7 @@ const Chat = () => {
     setInCall(false)
     setCallRinging(false)
     setCallStartedByMe(false)
-    callStartedByMeRef.current = false; 
+    callStartedByMeRef.current = false;
   }
 
   // presence helper
@@ -442,24 +442,55 @@ const Chat = () => {
 
           {/* Incoming Call UI */}
           {callRinging && !callStartedByMe && (
-            <div className="incoming-call-modal">
-              <p>{remoteUserName} is calling you...</p>
-              <button onClick={acceptCall} className="bg-green-500 text-white px-4 py-2 rounded">Accept</button>
-              <button onClick={rejectCall} className="bg-red-500 text-white px-4 py-2 rounded">Reject</button>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 font-alibaba">
+              <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4 border border-lightGray">
+                <div className="text-center mb-6">
+                  <h2 className="text-[36px] font-bold text-primary mb-3">
+                    Incoming Call
+                  </h2>
+                  <p className="text-[18px] text-textPrimary font-medium mb-2">
+                    {remoteUserName}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    wants to video chat
+                  </p>
+                </div>
+
+                <div className="flex gap-4 justify-center">
+                  <button
+                    onClick={rejectCall}
+                    className="px-6 py-3 bg-secondary text-white rounded-[12px] font-medium hover:bg-[#fd4e5c] transition"
+                  >
+                    Decline
+                  </button>
+                  <button
+                    onClick={acceptCall}
+                    className="px-6 py-3 bg-primary text-white rounded-[12px] font-medium hover:bg-[#007ea8] transition"
+                  >
+                    Accept
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
           {/* Outgoing Ringing UI */}
           {callRinging && callStartedByMe && !inCall && (
-            <div className="outgoing-call-indicator text-sm text-gray-500">Ringing...</div>
+            <div className="bg-white border border-lightGray rounded-[12px] shadow-sm px-4 py-2 font-alibaba">
+              <p className="text-sm font-medium text-textPrimary">
+                Calling {remoteUserName}...
+              </p>
+            </div>
           )}
 
-          <div className='flex flex-row justify-center items-center'>
+          <div className='flex flex-row justify-center items-center gap-5'>
             <button
               onClick={startCall}
-              className="bg-[#16a3bb] text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-[#1294a6] transition"
+              className="bg-primary text-white px-4 py-3 rounded-[12px] font-medium shadow hover:bg-[#007ea8] transition disabled:opacity-50 font-alibaba"
               disabled={inCall || callRinging}
-            >📹 Video Call</button>
+            >📹 Video Call
+            </button>
+
             <span className="text-sm text-gray-500">
               {onlineStatus
                 ? <span className="text-green-500 font-semibold">Online</span>

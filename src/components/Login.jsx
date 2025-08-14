@@ -51,7 +51,7 @@ const Login = () => {
       <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
         {/* Left illustration / branding section */}
         <div className="hidden md:flex flex-col items-center justify-center bg-[#F5F7FA] w-1/2 p-10">
-          <h1 className="font-bold text-[44px] text-textPrimary">DevTinder</h1>
+          <h1 className="font-bold text-[44px] text-textPrimary">LinkSpark</h1>
           <p className="text-center text-lg text-textPrimary max-w-xs mt-3">
             Where developers connect, collaborate, and grow.
           </p>
