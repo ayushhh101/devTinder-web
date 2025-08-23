@@ -44,7 +44,7 @@ const Navbar = () => {
     };
   }, []);
 
-  const isLoggedIn = Boolean(userObj && userObj._id);
+  const isLoggedIn = Boolean(userObj && userObj.id);
 
   return (
     <nav className="bg-[#0099CC] border-b border-[#c8e6ed] shadow-xl">

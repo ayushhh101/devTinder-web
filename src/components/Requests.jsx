@@ -14,14 +14,14 @@ const Requests = () => {
 
   const reviewRequest = async (status, request) => {
     try {
-      const res = await axios.post(`${BASE_URL}/request/review/${status}/${request._id}`, {},
+      const res = await axios.post(`${BASE_URL}/request/review/${status}/${request.id}`, {},
         { withCredentials: true })
-      dispatch(removeRequest(request._id))
+      dispatch(removeRequest(request.id))
 
       if (status === 'accepted' && globalSocket) {
         globalSocket.emit('sendConnectionAcceptedNotification', {
-          fromUserId: user._id,
-          toUserId: request.fromUserId._id,
+          fromUserId: user.id,
+          toUserId: request.senderId,
           firstName: user.firstName,
           lastName: user.lastName
         });
@@ -63,15 +63,15 @@ const Requests = () => {
 
       <div className='w-full max-w-5xl space-y-5'>
         {requests.map((request) => {
-          const { _id, firstName, lastName, photoUrl, age, gender, headline, about } = request.fromUserId
+          const { id, firstName, lastName, photoUrl, age, gender, headline, about } = request.sender
           return (
             <div
-              key={_id}
+              key={request.id}
               className='bg-white border border-lightGray rounded-2xl shadow-sm px-4 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4'
             >
               {/* Left: Avatar and Info */}
               <div className="flex flex-col sm:flex-row items-center flex-1 gap-4">
-                <Link to={`/profile/${_id}`}>
+                <Link to={`/profile/${id}`}>
                   <div className="w-14 h-14 rounded-full bg-lightGray overflow-hidden">
                     <img
                       src={photoUrl}

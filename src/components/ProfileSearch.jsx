@@ -116,7 +116,7 @@ const ProfileSearch = () => {
             </p>
           ) : (
             results.map(user => (
-              <UserCard key={user._id} user={user} showActions={true} variant="search"/>
+              <UserCard key={user.id} user={user} showActions={true} variant="search"/>
             ))
           )}
         </div>

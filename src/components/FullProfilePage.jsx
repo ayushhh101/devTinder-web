@@ -21,7 +21,7 @@ const FullProfilePage = () => {
   const { userId } = useParams();
   const [activeTab, setActiveTab] = useState(0);
   const [errorMsg, setErrorMsg] = useState('');
-  const currentUserId = useSelector(store => store.user?._id);
+  const currentUserId = useSelector(store => store.user?.id);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -220,7 +220,7 @@ const FullProfilePage = () => {
                   )
                   .map((proj, idx) => (
                     <div
-                      key={proj._id || idx}
+                      key={proj.id || idx}
                       className="bg-[#f7fafd] border border-[#e4e7ee] rounded-lg shadow-sm p-4"
                     >
                       {proj.title && (

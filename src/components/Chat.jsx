@@ -10,7 +10,7 @@ const Chat = () => {
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const user = useSelector(store => store.user)
-  const userId = user?._id;
+  const userId = user?.id;
 
   const socketRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -41,7 +41,7 @@ const Chat = () => {
     const fetchTargetUser = async () => {
       try {
         const { data } = await axios.get(`${BASE_URL}/user/${targetUserId}`, { withCredentials: true });
-        setTargetUser(data); // adjust 'data.data' if your API returns user object differently
+        setTargetUser(data.data);
       } catch (error) {
         setTargetUser(null);
       }

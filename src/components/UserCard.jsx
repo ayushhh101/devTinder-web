@@ -27,7 +27,7 @@ const UserCard = ({ user, variant = 'profile' }) => {
   const currentUser = useSelector(state => state.user);
 
   const {
-    _id: targetUserId,
+    id: targetUserId,
     firstName,
     lastName,
     photoUrl = '',
@@ -50,7 +50,7 @@ const UserCard = ({ user, variant = 'profile' }) => {
       //TODO: show notification
       if (status === 'interested' && globalSocket) {
         globalSocket.emit('sendConnectionRequestNotification', {
-          fromUserId: currentUser._id,
+          fromUserId: currentUser.id,
           toUserId: userId,
           firstName: currentUser.firstName,
           lastName: currentUser.lastName
@@ -154,7 +154,7 @@ const UserCard = ({ user, variant = 'profile' }) => {
           </div>
 
           <Link
-            to={`/profile/${user._id}`}
+            to={`/profile/${user.id}`}
             className={`${isSearch ? 'text-xs' : 'text-sm'} text-[#1790a7] font-medium hover:underline mt-1`}
           >
             View Full Profile

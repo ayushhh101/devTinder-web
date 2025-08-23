@@ -12,13 +12,13 @@ const NotificationListener = () => {
   const isInitialized = useRef(false);
 
   useEffect(() => {
-    if (!user?._id || isInitialized.current) return;
+    if (!user?.id || isInitialized.current) return;
 
     const socket = createSocketConnection();
     globalSocket = socket; 
     isInitialized.current = true;
 
-    socket.emit('setOnline', user._id);
+    socket.emit('setOnline', user.id);
 
     socket.on('newMessageNotification', (data) => {
       toast.info(`💬 ${data.firstName}: ${data.text}`);
